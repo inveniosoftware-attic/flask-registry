@@ -1,4 +1,0 @@
-Flask-Registry
-==============
-
-Flask-Registry
