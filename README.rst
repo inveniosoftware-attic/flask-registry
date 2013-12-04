@@ -32,7 +32,7 @@ Running the tests are as simple as: ::
 
 or (to also show test coverage) ::
 
-    source run-tests.py
+    source run-tests.sh
 
 License
 =======
@@ -46,6 +46,6 @@ You should have received a copy of the GNU General Public License along with Fla
 
 In applying this licence, CERN does not waive the privileges and immunities granted to it by virtue of its status as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-.. image:: https://d2weczhvl823v0.cloudfront.net/z4r/python-coveralls/trend.png
+.. image:: https://d2weczhvl823v0.cloudfront.net/inveniosoftware/flask-registry/trend.png
    :alt: Bitdeli badge
    :target: https://bitdeli.com/free
