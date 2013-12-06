@@ -24,5 +24,6 @@
 include COPYING AUTHORS CHANGES README.rst
 include .coveragerc run-tests.sh
 include docs/*.rst docs/*.py docs/Makefile
+include tests/*.py
 recursive-include docs/_themes *.py *.css *.css_t *.conf *.html COPYING README
 recursive-include docs/_templates *.html
