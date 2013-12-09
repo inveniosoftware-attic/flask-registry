@@ -25,12 +25,13 @@
 Flask-Registry extension
 """
 
+from __future__ import absolute_import
+
 from werkzeug.local import LocalProxy
 from flask import current_app
 
 
 class RegistryError(Exception):
-    """ """
     pass
 
 
@@ -63,6 +64,9 @@ class Registry(object):
     def __getitem__(self, key):
         return self._registry[key]
 
+    def __delitem__(self, key):
+        raise RegistryError("Registry cannot be deleted.")
+
     def __setitem__(self, key, value):
         if key in self._registry:
             raise RegistryError("Namespace %s already taken." % key)
@@ -77,6 +81,8 @@ class RegistryBase(object):
     """
     Base class for all registries
     """
+    _namespace = None
+
     @property
     def namespace(self):
         return self._namespace
@@ -109,11 +115,11 @@ class RegistryProxy(LocalProxy):
 #
 # API of registries
 #
-from flask_registry.registries.core import ListRegistry, DictRegistry, \
+from .registries.core import ListRegistry, DictRegistry, \
     ImportPathRegistry, ModuleRegistry
-from flask_registry.registries.modulediscovery import \
+from .registries.modulediscovery import \
     ModuleDiscoveryRegistry, ModuleAutoDiscoveryRegistry
-from flask_registry.registries.pkgresources import EntryPointRegistry, \
-    PkgResourcesDiscoveryRegistry
-from flask_registry.registries.appdiscovery import PackageRegistry, \
+from .registries.pkgresources import EntryPointRegistry, \
+    PkgResourcesDirDiscoveryRegistry
+from .registries.appdiscovery import PackageRegistry, \
     ExtensionRegistry, ConfigurationRegistry

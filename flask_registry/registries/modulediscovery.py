@@ -25,12 +25,14 @@
 Flask-Registry extension
 """
 
+from __future__ import absolute_import
+
 import six
 from werkzeug.utils import import_string
 from flask import current_app, has_app_context
 
 from flask_registry import RegistryProxy, RegistryBase, RegistryError
-from flask_registry.registries.core import ModuleRegistry
+from .core import ModuleRegistry
 
 
 class ModuleDiscoveryRegistry(ModuleRegistry):
@@ -66,12 +68,11 @@ class ModuleDiscoveryRegistry(ModuleRegistry):
         else:
             self.registry_namespace = registry_namespace or 'packages'
         # Setup config variable prefix
-        self.cfg_var_prefix = self.registry_namespace
-        self.cfg_var_prefix.upper()
-        self.cfg_var_prefix.replace('.', '_')
+        self.cfg_var_prefix = self.registry_namespace.upper()
+        self.cfg_var_prefix = self.cfg_var_prefix.replace('.', '_')
         super(ModuleDiscoveryRegistry, self).__init__(with_setup=with_setup)
 
-    def discover(self, app=None, *args, **kwargs):
+    def discover(self, app=None):
         """
         Discover modules
 
@@ -86,10 +87,8 @@ class ModuleDiscoveryRegistry(ModuleRegistry):
         """
         if app is None and has_app_context():
             app = current_app
-        if app is None and hasattr(self, 'app'):
-            app = getattr(self, 'app')
         if app is None:
-            RegistryError("You must provide a Flask application.")
+            raise RegistryError("You must provide a Flask application.")
 
         blacklist = app.config.get(
             '%s_%s_EXCLUDE' % (self.cfg_var_prefix, self.module_name.upper()),
@@ -103,9 +102,9 @@ class ModuleDiscoveryRegistry(ModuleRegistry):
             if pkg in blacklist:
                 continue
 
-            self._discover_module(pkg, app)
+            self._discover_module(pkg)
 
-    def _discover_module(self, pkg, app):
+    def _discover_module(self, pkg):
         """
         """
         import_str = pkg + '.' + self.module_name
@@ -115,10 +114,6 @@ class ModuleDiscoveryRegistry(ModuleRegistry):
             self.register(module)
         except ImportError:
             pass
-        except Exception as e:
-            import traceback
-            traceback.print_exc()
-            app.logger.error('Could not import: "%s: %s', import_str, str(e))
 
 
 class ModuleAutoDiscoveryRegistry(ModuleDiscoveryRegistry):

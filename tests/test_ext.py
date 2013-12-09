@@ -21,24 +21,11 @@
 ## granted to it by virtue of its status as an Intergovernmental Organization
 ## or submit itself to any jurisdiction.
 
-from unittest import TestCase
-from flask import Flask
+from __future__ import absolute_import
 
+from .helpers import FlaskTestCase
 from flask.ext.registry import Registry, RegistryError, RegistryBase, \
     RegistryProxy
-
-
-class FlaskTestCase(TestCase):
-    """
-    Mix-in class for creating the Flask application
-    """
-
-    def setUp(self):
-        app = Flask(__name__)
-        app.config['DEBUG'] = True
-        app.config['TESTING'] = True
-        app.logger.disabled = True
-        self.app = app
 
 
 class TestRegistry(FlaskTestCase):
@@ -79,6 +66,12 @@ class TestRegistry(FlaskTestCase):
         try:
             self.app.extensions['registry']['mynamespace'] = RegistryBase()
             raise AssertionError("No exception raise for double registration")
+        except RegistryError:
+            pass
+
+        try:
+            del self.app.extensions['registry']['mynamespace']
+            raise AssertionError("No exception raise for registry deletion")
         except RegistryError:
             pass
 

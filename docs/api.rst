@@ -5,7 +5,7 @@ API Docs
 
 Flask extension and registry proxy
 ----------------------------------
-.. module:: flask.ext.registry.core
+.. module:: flask_registry
 
 .. autoclass:: Registry
    :members:
@@ -18,7 +18,7 @@ Flask extension and registry proxy
 
 Core Registries
 ---------------
-.. module:: flask.ext.registry.registries.core
+.. module:: flask_registry.registries.core
 
 .. autoclass:: ListRegistry
    :members:
@@ -34,7 +34,7 @@ Core Registries
 
 Application Discovery
 ---------------------
-.. module:: flask.ext.registry.registries.appdiscovery
+.. module:: flask_registry.registries.appdiscovery
 
 .. autoclass:: ExtensionRegistry
    :members:
@@ -47,7 +47,7 @@ Application Discovery
 
 Module Discovery
 ----------------
-.. module:: flask.ext.registry.registries.modulediscovery
+.. module:: flask_registry.registries.modulediscovery
 
 .. autoclass:: ModuleDiscoveryRegistry
    :members:
@@ -57,7 +57,7 @@ Module Discovery
 
 Package Resources
 -----------------
-.. module:: flask.ext.registry.registries.pkgresources
+.. module:: flask_registry.registries.pkgresources
 
 .. autoclass:: EntryPointRegistry
    :members:

@@ -21,9 +21,11 @@
 ## granted to it by virtue of its status as an Intergovernmental Organization
 ## or submit itself to any jurisdiction.
 
+from __future__ import absolute_import
+
 from werkzeug.utils import import_string
-from flask_registry.registries.core import ListRegistry, ImportPathRegistry
-from flask_registry.registries.modulediscovery import ModuleDiscoveryRegistry
+from .core import ListRegistry, ImportPathRegistry
+from .modulediscovery import ModuleDiscoveryRegistry
 
 
 class ExtensionRegistry(ListRegistry):
@@ -85,9 +87,7 @@ class ConfigurationRegistry(ModuleDiscoveryRegistry):
     Example::
 
         app.extensions['registry']['packages'] = PackageRegistry()
-        app.extendsions['registry']['config'] = ConfigurationRegistry(
-            _app, base_config='invenio.core.config'
-        )
+        ConfigurationRegistry(app)
     """
     def __init__(self, app, registry_namespace=None):
         super(ConfigurationRegistry, self).__init__(

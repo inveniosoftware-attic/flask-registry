@@ -24,13 +24,14 @@
 """
 """
 
+from __future__ import absolute_import
+
 import os
 from werkzeug.utils import import_string
 from pkg_resources import iter_entry_points, resource_listdir
 
-from flask_registry.registries.core import DictRegistry
-from flask_registry.registries.modulediscovery import \
-    ModuleAutoDiscoveryRegistry
+from .core import DictRegistry
+from .modulediscovery import ModuleAutoDiscoveryRegistry
 
 
 class EntryPointRegistry(DictRegistry):
@@ -60,7 +61,7 @@ class EntryPointRegistry(DictRegistry):
         """
         super(EntryPointRegistry, self).__init__()
         self.load = load
-        for entry_point_group in iter_entry_points(iter_entry_points):
+        for entry_point_group in iter_entry_points(entry_point_ns):
             self.register(entry_point_group)
 
     def register(self, entry_point):
@@ -71,7 +72,7 @@ class EntryPointRegistry(DictRegistry):
         )
 
 
-class PkgResourcesDiscoveryRegistry(ModuleAutoDiscoveryRegistry):
+class PkgResourcesDirDiscoveryRegistry(ModuleAutoDiscoveryRegistry):
     """
     """
 

@@ -49,6 +49,11 @@ setup(
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
         'Topic :: Software Development :: Libraries :: Python Modules'
     ],
+    entry_points={
+        'flask_registry.test_entry': [
+            'testcase = flask_registry:RegistryBase',
+        ]
+    },
     test_suite='nose.collector',
     tests_require=['nose', 'coverage'],
 )

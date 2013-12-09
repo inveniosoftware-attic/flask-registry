@@ -21,7 +21,9 @@
 ## granted to it by virtue of its status as an Intergovernmental Organization
 ## or submit itself to any jurisdiction.
 
-from werkzeug.utils import find_modules
+from __future__ import absolute_import
+
+from werkzeug.utils import find_modules, import_string
 from flask_registry import RegistryBase, RegistryError
 
 
@@ -40,6 +42,9 @@ class ListRegistry(RegistryBase):
 
     def __contains__(self, item):
         return self.registry.__contains__(item)
+
+    def __getitem__(self, idx):
+        return self.registry[idx]
 
     def register(self, item):
         self.registry.append(item)
@@ -99,18 +104,26 @@ class ImportPathRegistry(ListRegistry):
         for impstr in registry:
             print impstr
     """
-    def __init__(self, initial=None):
+    def __init__(self, initial=None, load_modules=False):
         super(ImportPathRegistry, self).__init__()
+        self.load_modules = load_modules
         if initial:
             for import_path in initial:
                 self.register(import_path)
 
+    def load_import_path(self, import_path):
+        return import_string(import_path) if self.load_modules else import_path
+
     def register(self, import_path):
         if import_path.endswith('.*'):
             for p in find_modules(import_path[:-2], include_packages=True):
-                super(ImportPathRegistry, self).register(p)
+                super(ImportPathRegistry, self).register(
+                    self.load_import_path(p)
+                )
         else:
-            super(ImportPathRegistry, self).register(import_path)
+            super(ImportPathRegistry, self).register(
+                self.load_import_path(import_path)
+            )
 
     def unregister(self, *args, **kwargs):
         raise NotImplementedError()
