@@ -112,6 +112,9 @@ class RegistryProxy(LocalProxy):
         super(RegistryProxy, self).__init__(_lookup)
 
 
+# Version information
+from .version import __version__
+
 #
 # API of registries
 #
@@ -123,3 +126,12 @@ from .registries.pkgresources import EntryPointRegistry, \
     PkgResourcesDirDiscoveryRegistry
 from .registries.appdiscovery import PackageRegistry, \
     ExtensionRegistry, ConfigurationRegistry
+
+__all__ = [
+    'Registry', 'RegistryError', 'RegistryProxy', 'RegistryBase',
+    'ListRegistry', 'DictRegistry', 'ImportPathRegistry', 'ModuleRegistry',
+    'ModuleDiscoveryRegistry', 'ModuleAutoDiscoveryRegistry',
+    'EntryPointRegistry', 'PkgResourcesDirDiscoveryRegistry',
+    'PackageRegistry', 'ExtensionRegistry', 'ConfigurationRegistry',
+    'BlueprintAutoDiscoveryRegistry', '__version__'
+]

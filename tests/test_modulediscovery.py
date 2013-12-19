@@ -36,7 +36,7 @@ class TestModuleDiscoveryRegistry(FlaskTestCase):
         self.app.extensions['registry']['pathns'] = \
             ImportPathRegistry(initial=['flask_registry.*'])
 
-        assert len(self.app.extensions['registry']['pathns']) == 1
+        assert len(self.app.extensions['registry']['pathns']) == 2
 
         self.app.extensions['registry']['myns'] = \
             ModuleDiscoveryRegistry(
@@ -139,7 +139,7 @@ class TestModuleDiscoveryRegistry(FlaskTestCase):
                 )
 
             assert 'pathns' in self.app.extensions['registry']
-            assert len(self.app.extensions['registry']['pathns']) == 1
+            assert len(self.app.extensions['registry']['pathns']) == 2
 
             self.app.extensions['registry']['myns'].discover()
 
@@ -155,7 +155,7 @@ class TestModuleAutoDiscoveryRegistry(FlaskTestCase):
         self.app.extensions['registry']['pathns'] = \
             ImportPathRegistry(initial=['flask_registry.*'])
 
-        assert len(self.app.extensions['registry']['pathns']) == 1
+        assert len(self.app.extensions['registry']['pathns']) == 2
 
         self.app.extensions['registry']['myns'] = \
             ModuleAutoDiscoveryRegistry(

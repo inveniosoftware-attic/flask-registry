@@ -32,6 +32,12 @@ class TestRegistry(FlaskTestCase):
     """
     Tests for the main registry class
     """
+    def test_version(self):
+        # Assert that version number can be parsed.
+        from flask_registry import __version__
+        from distutils.version import LooseVersion
+        LooseVersion(__version__)
+
     def test_creation(self):
         assert 'registry' not in self.app.extensions
         Registry(app=self.app)
