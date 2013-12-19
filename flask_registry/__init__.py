@@ -125,7 +125,7 @@ from .registries.modulediscovery import \
 from .registries.pkgresources import EntryPointRegistry, \
     PkgResourcesDirDiscoveryRegistry
 from .registries.appdiscovery import PackageRegistry, \
-    ExtensionRegistry, ConfigurationRegistry
+    ExtensionRegistry, ConfigurationRegistry, BlueprintAutoDiscoveryRegistry
 
 __all__ = [
     'Registry', 'RegistryError', 'RegistryProxy', 'RegistryBase',

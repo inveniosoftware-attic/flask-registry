@@ -25,16 +25,17 @@ from __future__ import absolute_import
 
 from werkzeug.utils import import_string
 from .core import ListRegistry, ImportPathRegistry
-from .modulediscovery import ModuleDiscoveryRegistry
+from .modulediscovery import ModuleDiscoveryRegistry, \
+    ModuleAutoDiscoveryRegistry
 
 
 class ExtensionRegistry(ListRegistry):
     """
     Flask extensions registry
 
-    Loads all extensions specified by ``EXTENSIONS`` configuration variable. The
-    registry will look for a ``setup_app`` function in the extension and call it
-    if it exists.
+    Loads all extensions specified by ``EXTENSIONS`` configuration variable.
+    The registry will look for a ``setup_app`` function in the extension and
+    call it if it exists.
 
     Example::
 
@@ -113,3 +114,53 @@ class ConfigurationRegistry(ModuleDiscoveryRegistry):
 
     def unregister(self, *args, **kwargs):
         raise NotImplementedError()
+
+
+from flask import Blueprint
+
+
+class BlueprintAutoDiscoveryRegistry(ModuleAutoDiscoveryRegistry):
+    """
+    Discover Flask Blueprints from packages defined in another registry.
+
+    Defaults to loading ``views`` from each package, and looking for a variable
+    ``blueprints`` (list of Blueprint instances) or  ``blueprint`` (a
+    Blueprint instance). If found, the blueprint will be registered on the
+    Flask application.
+
+    A blueprint URL prefix can be overwritten using the
+    ``BLUEPRINTS_URL_PREFIXES`` variable in the application configuration::
+
+        BLUEPRINTS_URL_PREFIXES = {
+            '<blueprint name>': '<new url prefix>',
+            # ...
+        }
+    """
+    def __init__(self, module_name=None, app=None, *args, **kwargs):
+        super(BlueprintAutoDiscoveryRegistry, self).__init__(
+            module_name or 'views', app=app, *args, **kwargs
+        )
+
+    def _discover_module(self, pkg):
+        import_str = pkg + '.' + self.module_name
+
+        module = import_string(import_str)
+
+        candidates = []
+        if 'blueprints' in dir(module):
+            candidates += getattr(module, 'blueprints')
+
+        if 'blueprint' in dir(module):
+            candidates.append(getattr(module, 'blueprint'))
+
+        for candidate in candidates:
+            if isinstance(candidate, Blueprint):
+                # Register on app
+                self.app.register_blueprint(
+                    candidate,
+                    url_prefix=self.app.config.get(
+                        'BLUEPRINTS_URL_PREFIXES', {}
+                    ).get(candidate.name)
+                )
+                # Register in registry
+                self.register(candidate)

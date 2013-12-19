@@ -24,8 +24,8 @@
 from __future__ import absolute_import
 
 from .helpers import FlaskTestCase
-from flask.ext.registry import Registry, ExtensionRegistry, PackageRegistry, \
-    ConfigurationRegistry
+from flask_registry import Registry, ExtensionRegistry, PackageRegistry, \
+    ConfigurationRegistry, ImportPathRegistry, BlueprintAutoDiscoveryRegistry
 
 
 class TestExtensionRegistry(FlaskTestCase):
@@ -58,7 +58,7 @@ class TestPackageRegistry(FlaskTestCase):
 
         self.assertEqual(
             len(self.app.extensions['registry']['packages']),
-            8
+            9
         )
 
 
@@ -84,4 +84,20 @@ class TestConfigurationRegistry(FlaskTestCase):
         self.assertRaises(
             NotImplementedError,
             self.app.extensions['registry']['config'].unregister
+        )
+
+
+class TestBlueprintAutoDiscoveryRegistry(FlaskTestCase):
+    def test_registration(self):
+        Registry(app=self.app)
+
+        self.app.extensions['registry']['packages'] = \
+            ImportPathRegistry(initial=['tests'])
+
+        self.app.extensions['registry']['blueprints'] = \
+            BlueprintAutoDiscoveryRegistry(app=self.app)
+
+        self.assertEqual(
+            len(self.app.extensions['registry']['blueprints']),
+            3
         )
