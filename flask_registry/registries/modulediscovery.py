@@ -27,8 +27,10 @@ Flask-Registry extension
 
 from __future__ import absolute_import
 
+import sys
 import six
-from werkzeug.utils import import_string
+from werkzeug.utils import find_modules, import_string
+from werkzeug._compat import reraise
 from flask import current_app, has_app_context
 
 from flask_registry import RegistryProxy, RegistryBase, RegistryError
@@ -112,8 +114,21 @@ class ModuleDiscoveryRegistry(ModuleRegistry):
         try:
             module = import_string(import_str, self.silent)
             self.register(module)
-        except ImportError:
-            pass
+        except ImportError as e:
+            # If a module does not exists, it's not an error, however an
+            # ImportError generated from importing an existing module is an
+            # error.
+            try:
+                for found_module_name in find_modules(pkg):
+                    if found_module_name == import_str:
+                        reraise(
+                            ImportError,
+                            ImportError(*e.args),
+                            sys.exc_info()[2]
+                        )
+            except ValueError:
+                # pkg doesn't exist or is not a package
+                pass
 
 
 class ModuleAutoDiscoveryRegistry(ModuleDiscoveryRegistry):

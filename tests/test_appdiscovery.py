@@ -58,7 +58,7 @@ class TestPackageRegistry(FlaskTestCase):
 
         self.assertEqual(
             len(self.app.extensions['registry']['packages']),
-            9
+            10
         )
 
 

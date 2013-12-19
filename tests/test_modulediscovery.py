@@ -101,6 +101,25 @@ class TestModuleDiscoveryRegistry(FlaskTestCase):
             self.app.extensions['registry']['myns'].discover()
             assert len(self.app.extensions['registry']['myns']) == 0
 
+    def test_broken_module(self):
+        Registry(app=self.app)
+
+        self.app.extensions['registry']['pathns'] = \
+            ImportPathRegistry(initial=['tests'])
+
+        self.app.extensions['registry']['myns'] = \
+            ModuleDiscoveryRegistry(
+                'broken_module',
+                registry_namespace='pathns'
+            )
+
+        with self.app.app_context():
+            self.assertRaises(
+                ImportError,
+                self.app.extensions['registry']['myns'].discover
+            )
+            assert len(self.app.extensions['registry']['myns']) == 0
+
     def test_modules_namespace(self):
         from flask_registry import registries
         Registry(app=self.app)
