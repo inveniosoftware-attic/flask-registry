@@ -104,6 +104,12 @@ class TestRegistry(FlaskTestCase):
         assert self.app.extensions['registry']['mynamespace'].namespace == \
             'mynamespace'
 
+        try:
+            self.app.extensions['registry']['mynamespace'].namespace = "na"
+            raise AssertionError("RegistryError not raised.")
+        except RegistryError:
+            pass
+
     def test_registry_base(self):
         Registry(app=self.app)
         self.app.extensions['registry']['myns'] = RegistryBase()

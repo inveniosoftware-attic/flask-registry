@@ -71,12 +71,13 @@ class Registry(object):
         if key in self._registry:
             raise RegistryError("Namespace %s already taken." % key)
         self._registry[key] = value
-        self._registry[key]._namespace = key
+        self._registry[key].namespace = key
 
     def items(self):
         return self._registry.items()
 
 
+# pylint: disable=R0921
 class RegistryBase(object):
     """
     Base class for all registries
@@ -86,6 +87,12 @@ class RegistryBase(object):
     @property
     def namespace(self):
         return self._namespace
+
+    @namespace.setter
+    def namespace(self, value):
+        if self._namespace:
+            raise RegistryError("Namespace cannot be changed.")
+        self._namespace = value
 
     def register(self, *args, **kwargs):
         raise NotImplementedError()
@@ -100,14 +107,18 @@ class RegistryProxy(LocalProxy):
     registry in your module without needing to initialize it first (since you
     need the Flaks application).
     """
+
+    # pylint: disable=W0142
     def __init__(self, namespace, registry_class, *args, **kwargs):
         def _lookup():
             if not 'registry' in getattr(current_app, 'extensions', {}):
                 raise RegistryError('Registry is not initialized.')
             if namespace not in current_app.extensions['registry']:
-                current_app.extensions['registry'][namespace] = registry_class(
-                    *args, **kwargs
-                )
+                # pylint: disable=W0142
+                current_app.extensions['registry'][namespace] = \
+                    registry_class(
+                        *args, **kwargs
+                    )
             return current_app.extensions['registry'][namespace]
         super(RegistryProxy, self).__init__(_lookup)
 

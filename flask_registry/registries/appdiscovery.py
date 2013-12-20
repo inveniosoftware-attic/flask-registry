@@ -29,6 +29,7 @@ from .modulediscovery import ModuleDiscoveryRegistry, \
     ModuleAutoDiscoveryRegistry
 
 
+# pylint: disable=R0921
 class ExtensionRegistry(ListRegistry):
     """
     Flask extensions registry
@@ -52,16 +53,17 @@ class ExtensionRegistry(ListRegistry):
         for ext_name in app.config.get('EXTENSIONS', []):
             self.register(app, ext_name)
 
-    def register(self, app, ext_name):
+    def register(self, app, ext_name):  # pylint: disable=W0221
         ext = import_string(ext_name)
         super(ExtensionRegistry, self).register(ext_name)
         ext = getattr(ext, 'setup_app', ext)
         ext(app)
 
-    def unregister(self):
+    def unregister(self):  # pylint: disable=W0221
         raise NotImplementedError()
 
 
+# pylint: disable=W0223
 class PackageRegistry(ImportPathRegistry):
     """
     Specialized import path registry that takes the initial list of import
@@ -80,6 +82,7 @@ class PackageRegistry(ImportPathRegistry):
         )
 
 
+# pylint: disable=R0921
 class ConfigurationRegistry(ModuleDiscoveryRegistry):
     """
     Specialized import path registry that takes the initial list of import

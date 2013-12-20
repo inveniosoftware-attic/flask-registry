@@ -64,7 +64,7 @@ class EntryPointRegistry(DictRegistry):
         for entry_point_group in iter_entry_points(entry_point_ns):
             self.register(entry_point_group)
 
-    def register(self, entry_point):
+    def register(self, entry_point):  # pylint: disable=W0221
         if entry_point.name not in self.registry:
             self.registry[entry_point.name] = []
         self.registry[entry_point.name].append(
@@ -79,8 +79,8 @@ class PkgResourcesDirDiscoveryRegistry(ModuleAutoDiscoveryRegistry):
     def _discover_module(self, pkg):
         """
         """
-        for f in resource_listdir(pkg, self.module_name):
+        for filename in resource_listdir(pkg, self.module_name):
             self.register(os.path.join(
                 os.path.dirname(import_string(pkg).__file__),
-                self.module_name, f)
+                self.module_name, filename)
             )

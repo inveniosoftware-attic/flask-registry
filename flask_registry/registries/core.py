@@ -21,6 +21,7 @@
 ## granted to it by virtue of its status as an Intergovernmental Organization
 ## or submit itself to any jurisdiction.
 
+
 from __future__ import absolute_import
 
 from werkzeug.utils import find_modules, import_string
@@ -46,10 +47,10 @@ class ListRegistry(RegistryBase):
     def __getitem__(self, idx):
         return self.registry[idx]
 
-    def register(self, item):
+    def register(self, item):  # pylint: disable=W0221
         self.registry.append(item)
 
-    def unregister(self, item):
+    def unregister(self, item):  # pylint: disable=W0221
         self.registry.remove(item)
 
 
@@ -78,18 +79,19 @@ class DictRegistry(RegistryBase):
     def __delitem__(self, key):
         return self.registry.__delitem__(key)
 
-    def register(self, key, value):
+    def register(self, key, value):  # pylint: disable=W0221
         if key in self.registry:
             raise RegistryError("Key %s already registered." % key)
         self.registry[key] = value
 
-    def unregister(self, key):
+    def unregister(self, key):  # pylint: disable=W0221
         del self.registry[key]
 
     def items(self):
         return self.registry.items()
 
 
+# pylint: disable=R0921
 class ImportPathRegistry(ListRegistry):
     """
     Import path registry
@@ -116,9 +118,10 @@ class ImportPathRegistry(ListRegistry):
 
     def register(self, import_path):
         if import_path.endswith('.*'):
-            for p in find_modules(import_path[:-2], include_packages=True):
+            for mod_path in find_modules(import_path[:-2],
+                                         include_packages=True):
                 super(ImportPathRegistry, self).register(
-                    self.load_import_path(p)
+                    self.load_import_path(mod_path)
                 )
         else:
             super(ImportPathRegistry, self).register(

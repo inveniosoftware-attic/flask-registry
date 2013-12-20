@@ -114,7 +114,7 @@ class ModuleDiscoveryRegistry(ModuleRegistry):
         try:
             module = import_string(import_str, self.silent)
             self.register(module)
-        except ImportError as e:
+        except ImportError as e:  # pylint: disable=C0103
             # If a module does not exists, it's not an error, however an
             # ImportError generated from importing an existing module is an
             # error.
