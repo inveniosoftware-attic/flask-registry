@@ -21,10 +21,42 @@
 ## granted to it by virtue of its status as an Intergovernmental Organization
 ## or submit itself to any jurisdiction.
 
-include COPYING AUTHORS CHANGES README.rst
-include .coveragerc run-tests.sh
-include docs/*.rst docs/*.py docs/Makefile
-include tests/*.py
-include tests/resources/testresource.cfg
-recursive-include docs/_themes *.py *.css *.css_t *.conf *.html README
-recursive-include docs/_templates *.html
+from unittest import TestCase
+from flask import Flask
+
+
+class FlaskTestCase(TestCase):
+    """
+    Mix-in class for creating the Flask application
+    """
+
+    def setUp(self):
+        app = Flask(__name__)
+        app.config['DEBUG'] = True
+        app.config['TESTING'] = True
+        app.logger.disabled = True
+        self.app = app
+
+
+class MockModule(object):
+    """
+    Helper mock module to check that specific methods are called.
+    """
+
+    def __init__(self):
+        self.called_setup = None
+        self.called_teardown = None
+
+    def setup(self):
+        self.called_setup = True
+
+    def teardown(self):
+        self.called_teardown = True
+
+    def assert_called(self):
+        assert self.called_setup is True
+        assert self.called_teardown is True
+
+    def assert_not_called(self):
+        assert self.called_setup is None
+        assert self.called_teardown is None

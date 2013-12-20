@@ -22,32 +22,106 @@
 ## or submit itself to any jurisdiction.
 
 """
-Flask-Registry extension
+Module Discovery
+================
+The module discovery registries provide discovery functionality useful
+for searching a list of Python packages for a specific module name, and
+afterwards registering the module. This is used to e.g. load and register
+Flask blueprints by ``BlueprintAutoDiscoveryRegistry``.
+
+Assume e.g. we want to discover the ``helpers`` module from the ``tests``
+package. First we initialize the registry:
+
+>>> from flask import Flask
+>>> from flask_registry import Registry, ModuleDiscoveryRegistry
+>>> from flask_registry import ImportPathRegistry
+>>> app = Flask('myapp')
+>>> r = Registry(app=app)
+
+We then create the list of packages to search through using an
+``ImportPathRegistry``:
+
+>>> r['mypackages'] = ImportPathRegistry(initial=['tests'])
+
+Then, initialize the ``ModuleDiscoveryRegistry`` and run the discovery:
+
+>>> r['mydiscoveredmodules'] = ModuleDiscoveryRegistry(
+...     'helpers', registry_namespace='mypackages')
+>>> len(r['mydiscoveredmodules'])
+0
+>>> r['mydiscoveredmodules'].discover(app=app)
+>>> len(r['mydiscoveredmodules'])
+1
+
+Lazy discovery
+^^^^^^^^^^^^^^
+Using ``RegistryProxy`` you may lazily discover modules. Above example using
+lazy loading looks like this:
+
+>>> from flask_registry import RegistryProxy
+>>> app = Flask('myapp')
+>>> r = Registry(app=app)
+>>> pkg_proxy = RegistryProxy('mypackages', ImportPathRegistry,
+...     initial=['tests'])
+>>> mod_proxy = RegistryProxy('mydiscoveredmodules',
+...     ModuleDiscoveryRegistry,
+...     'helpers',
+...     registry_namespace=pkg_proxy)
+>>> 'mypackages' in r
+False
+>>> 'mydiscoveredmodules' in r
+False
+>>> with app.app_context():
+...     mod_proxy.discover(app=app)
+>>> 'mypackages' in r
+True
+>>> 'mydiscoveredmodules' in r
+True
 """
 
+from __future__ import absolute_import
+
+import sys
 import six
-from werkzeug.utils import import_string
+from werkzeug.utils import find_modules, import_string
+from werkzeug._compat import reraise
 from flask import current_app, has_app_context
 
 from flask_registry import RegistryProxy, RegistryBase, RegistryError
-from flask_registry.registries.core import ModuleRegistry
+from .core import ModuleRegistry
 
 
 class ModuleDiscoveryRegistry(ModuleRegistry):
     """
-    Python module registry with discover capabilities.
+    Specialized ``ModuleRegistry`` that will search a list of Python packages
+    in an ``ImportPathRegistry`` or ``ModuleRegistry`` for a specific module
+    name. By default the list of Python packages is read from the ``packages``
+    registry namespace.
 
-    The registry will discover module with a given name from packages specified
-    in a ``PackageRegistry``.
+    Packages may be excluded during the discovery using a configuration
+    variables constructed according to the following pattern::
 
-    Example::
+        <NAMESPACE>_<MODULE_NAME>_EXCLUDE
 
-        app.config['PACKAGES'] = ['invenio.modules.*', ...]
-        app.config['PACKAGES_VIEWS_EXCLUDE'] = ['invenio.modules.oldstuff']
+    where ``<NAMESPACE>`` should be replaced by the ``registry_namepsace``, and
+    ``<MOUDLE_NAME>`` should be replaced with ``module_name``. Example:
+    ``PACKAGES_VIEWS_EXCLUDE``. All namespaces are capitalized and have dots
+    replaced with underscores.
 
-        app.extensions['registry']['packages'] = PackageRegistry()
-        app.extensions['registry']['views'] = DiscoverRegistry('views')
-        app.extensions['registry']['views'].discover(app)
+    Subclasses of ``ModuleDiscoveryRegistry`` may overwrite the internal
+    ``_discover_module()`` method to provide specialized discovery (see e.g.
+    ``BlueprintAutoDiscoveryRegistry``).
+
+    :param module_name: Name of module to search for in packages.
+    :param registry_namespace: The registry namespace of an
+        ``ImportPathRegistry`` or ``ModuleRegistry`` with a list Python
+        packages to search for ``module_name`` modules in. Alternatively to
+        a registry namespace an instance of a ``RegistryProxy`` or ``Registry``
+        may also be used. Defaults to ``packages``.
+    :param with_setup: Call setup and teardown function on discovered modules.
+        Defaults to ``False`` (see ``ModuleRegistry``).
+    :param silent: if set to True import errors are ignored. Defaults to
+        ``False``.
     """
 
     def __init__(self, module_name, registry_namespace=None, with_setup=False,
@@ -65,31 +139,26 @@ class ModuleDiscoveryRegistry(ModuleRegistry):
             self.registry_namespace = registry_namespace.namespace
         else:
             self.registry_namespace = registry_namespace or 'packages'
+        assert self.registry_namespace is not None
         # Setup config variable prefix
-        self.cfg_var_prefix = self.registry_namespace
-        self.cfg_var_prefix.upper()
-        self.cfg_var_prefix.replace('.', '_')
+        self.cfg_var_prefix = self.registry_namespace.upper()
+        self.cfg_var_prefix = self.cfg_var_prefix.replace('.', '_')
         super(ModuleDiscoveryRegistry, self).__init__(with_setup=with_setup)
 
-    def discover(self, app=None, *args, **kwargs):
+    def discover(self, app=None):
         """
-        Discover modules
+        Perform module discovery, by iterating over the list of Python packages
+        in the order they are specified.
 
-        Specific modules can be excluded with the configuration variable
-        ``<NAMESPACE>_<MODULE_NAME>_EXCLUDE`` (e.g ``PACKAGES_VIEWS_EXCLUDE``).
-        The namespace name is capitalized and have dots replace by underscore.
-
-        :param module_name: Name of module to look for in packages
-        :param registry_namespace: Name of registry containing the package
-            registry. Defaults to ``packages``.
-        :param with_setup: Call ``setup`` and ``teardown`` functions on module.
+        :param app: Flask application object from where the list of Python
+            packages is loaded (from the ``registry_namespace``). Defaults to
+            ``current_app`` if not specified (thus requires you are working
+            in the Flask application context).
         """
         if app is None and has_app_context():
             app = current_app
-        if app is None and hasattr(self, 'app'):
-            app = getattr(self, 'app')
         if app is None:
-            RegistryError("You must provide a Flask application.")
+            raise RegistryError("You must provide a Flask application.")
 
         blacklist = app.config.get(
             '%s_%s_EXCLUDE' % (self.cfg_var_prefix, self.module_name.upper()),
@@ -103,33 +172,58 @@ class ModuleDiscoveryRegistry(ModuleRegistry):
             if pkg in blacklist:
                 continue
 
-            self._discover_module(pkg, app)
+            self._discover_module(pkg)
 
-    def _discover_module(self, pkg, app):
+    def _discover_module(self, pkg):
         """
+        Method to discover a single module. May be overwritten by subclasses.
         """
         import_str = pkg + '.' + self.module_name
 
         try:
             module = import_string(import_str, self.silent)
             self.register(module)
-        except ImportError:
-            pass
-        except Exception as e:
-            import traceback
-            traceback.print_exc()
-            app.logger.error('Could not import: "%s: %s', import_str, str(e))
+        except ImportError as e:  # pylint: disable=C0103
+            # If a module does not exists, it's not an error, however an
+            # ImportError generated from importing an existing module is an
+            # error.
+            try:
+                for found_module_name in find_modules(pkg):
+                    if found_module_name == import_str:
+                        reraise(
+                            ImportError,
+                            ImportError(*e.args),
+                            sys.exc_info()[2]
+                        )
+            except ValueError:
+                # pkg doesn't exist or is not a package
+                pass
 
 
 class ModuleAutoDiscoveryRegistry(ModuleDiscoveryRegistry):
     """
+    Specialized ``ModuleDiscoveryRegistry`` that will discover modules
+    immediately on initialization.
+
+    :param module_name: Name of module to search for in packages.
+    :param app: Flask application object
+    :param registry_namespace: The registry namespace of an
+        ``ImportPathRegistry`` or ``ModuleRegistry`` with a list Python
+        packages to search for ``module_name`` modules in. Alternatively to
+        a registry namespace an instance of a ``RegistryProxy`` or ``Registry``
+        may also be used. Defaults to ``packages``.
+    :param with_setup: Call setup and teardown function on discovered modules.
+        Defaults to ``False`` (see ``ModuleRegistry``).
+    :param silent: if set to True import errors are ignored. Defaults to
+        ``False``.
     """
 
-    def __init__(self, module_name, app=None, *args, **kwargs):
-        """
-        """
+    # pylint: disable=R0913
+    def __init__(self, module_name, app=None, registry_namespace=None,
+                 with_setup=False, silent=False):
         super(ModuleAutoDiscoveryRegistry, self).__init__(
-            module_name, *args, **kwargs
+            module_name, with_setup=with_setup, silent=silent,
+            registry_namespace=registry_namespace
         )
         self.app = app
         self.discover(app=app)

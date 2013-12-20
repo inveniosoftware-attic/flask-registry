@@ -21,10 +21,11 @@
 ## granted to it by virtue of its status as an Intergovernmental Organization
 ## or submit itself to any jurisdiction.
 
-include COPYING AUTHORS CHANGES README.rst
-include .coveragerc run-tests.sh
-include docs/*.rst docs/*.py docs/Makefile
-include tests/*.py
-include tests/resources/testresource.cfg
-recursive-include docs/_themes *.py *.css *.css_t *.conf *.html README
-recursive-include docs/_templates *.html
+
+"""
+Mock object for an Invenio extension
+"""
+
+
+def setup_app(app):
+    app.config['MOCKEXT'] = True

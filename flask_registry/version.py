@@ -21,10 +21,14 @@
 ## granted to it by virtue of its status as an Intergovernmental Organization
 ## or submit itself to any jurisdiction.
 
-include COPYING AUTHORS CHANGES README.rst
-include .coveragerc run-tests.sh
-include docs/*.rst docs/*.py docs/Makefile
-include tests/*.py
-include tests/resources/testresource.cfg
-recursive-include docs/_themes *.py *.css *.css_t *.conf *.html README
-recursive-include docs/_templates *.html
+"""
+Version information for Flask-Registry
+
+This file is imported by ``flask_registry.__init__``, and parsed by
+``setup.py`` as well as ``docs/conf.py``.
+"""
+
+# Do not change the format of this next line. Doing so risks breaking
+# setup.py and docs/conf.py
+
+__version__ = "0.1"

@@ -22,15 +22,26 @@
 ## or submit itself to any jurisdiction.
 
 from setuptools import setup
+import os
+import re
+
+# Get the version string.  Cannot be done with import!
+with open(os.path.join('flask_registry', 'version.py'), 'rt') as f:
+    version = re.search(
+        '__version__\s*=\s*"(?P<version>.*)"\n',
+        f.read()
+    ).group('version')
 
 setup(
     name='Flask-Registry',
-    version='0.1',
+    version=version,
     url='http://github.com/inveniosoftware/flask-registry/',
     license='GPLv2',
     author='Invenio collaboration',
     author_email='info@invenio-software.org',
-    description='Flask Registry',
+    description='Flask-Registry is an extension for Flask that allow '
+        'frameworks to dynamically assemble your Flask application from '
+        'reusable packages.',
     long_description=open('README.rst').read(),
     packages=['flask_registry', 'flask_registry.registries'],
     zip_safe=False,
@@ -49,6 +60,11 @@ setup(
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
         'Topic :: Software Development :: Libraries :: Python Modules'
     ],
+    entry_points={
+        'flask_registry.test_entry': [
+            'testcase = flask_registry:RegistryBase',
+        ]
+    },
     test_suite='nose.collector',
     tests_require=['nose', 'coverage'],
 )

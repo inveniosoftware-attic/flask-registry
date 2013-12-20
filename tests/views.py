@@ -21,10 +21,25 @@
 ## granted to it by virtue of its status as an Intergovernmental Organization
 ## or submit itself to any jurisdiction.
 
-include COPYING AUTHORS CHANGES README.rst
-include .coveragerc run-tests.sh
-include docs/*.rst docs/*.py docs/Makefile
-include tests/*.py
-include tests/resources/testresource.cfg
-recursive-include docs/_themes *.py *.css *.css_t *.conf *.html README
-recursive-include docs/_templates *.html
+"""
+Test file for BlueprintAutoDiscoverRegistry testing
+"""
+
+from flask import Blueprint
+
+blueprint = Blueprint('test', __name__)
+
+blueprints = [
+    Blueprint('test1', __name__),
+    Blueprint('test2', __name__)
+]
+
+
+@blueprint.route("/", methods=['GET', ])
+def index():
+    from flask import current_app
+    if current_app.config['USER_CFG'] and current_app.config['DEFAULT_CFG'] \
+       and current_app.config['MOCKEXT']:
+        return "Hello from Flask-Registry"
+    else:
+        return "Not everything loaded"

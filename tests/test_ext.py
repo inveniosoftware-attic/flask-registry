@@ -21,30 +21,25 @@
 ## granted to it by virtue of its status as an Intergovernmental Organization
 ## or submit itself to any jurisdiction.
 
-from unittest import TestCase
-from flask import Flask
+from __future__ import absolute_import
 
+import six
+
+from .helpers import FlaskTestCase
 from flask.ext.registry import Registry, RegistryError, RegistryBase, \
     RegistryProxy
-
-
-class FlaskTestCase(TestCase):
-    """
-    Mix-in class for creating the Flask application
-    """
-
-    def setUp(self):
-        app = Flask(__name__)
-        app.config['DEBUG'] = True
-        app.config['TESTING'] = True
-        app.logger.disabled = True
-        self.app = app
 
 
 class TestRegistry(FlaskTestCase):
     """
     Tests for the main registry class
     """
+    def test_version(self):
+        # Assert that version number can be parsed.
+        from flask_registry import __version__
+        from distutils.version import LooseVersion
+        LooseVersion(__version__)
+
     def test_creation(self):
         assert 'registry' not in self.app.extensions
         Registry(app=self.app)
@@ -82,6 +77,12 @@ class TestRegistry(FlaskTestCase):
         except RegistryError:
             pass
 
+        try:
+            del self.app.extensions['registry']['mynamespace']
+            raise AssertionError("No exception raise for registry deletion")
+        except RegistryError:
+            pass
+
         # Registered object
         assert isinstance(
             self.app.extensions['registry']['mynamespace'],
@@ -104,6 +105,12 @@ class TestRegistry(FlaskTestCase):
         self.app.extensions['registry']['mynamespace'] = RegistryBase()
         assert self.app.extensions['registry']['mynamespace'].namespace == \
             'mynamespace'
+
+        try:
+            self.app.extensions['registry']['mynamespace'].namespace = "na"
+            raise AssertionError("RegistryError not raised.")
+        except RegistryError:
+            pass
 
     def test_registry_base(self):
         Registry(app=self.app)
@@ -141,6 +148,24 @@ class TestRegistryProxy(FlaskTestCase):
         with self.app.app_context():
             try:
                 proxy.register()
-                raise AssertionError("Registry is supposed not to be avialable")
+                raise AssertionError(
+                    "Registry is supposed not to be avialable"
+                )
             except RegistryError:
                 pass
+
+
+class TestExampleApp(FlaskTestCase):
+    def setUp(self):
+        from tests.example_app import create_app, Config
+        self.config = Config()
+        self.app = create_app(self.config)
+        self.app.config['DEBUG'] = True
+        self.app.config['TESTING'] = True
+        self.app.logger.disabled = True
+        self.client = self.app.test_client()
+
+    def test_blueprint_loaded(self):
+        # Test that app is loaded and that blueprints have been registered
+        response = self.client.get("/")
+        self.assertEqual(response.data, six.b("Hello from Flask-Registry"))

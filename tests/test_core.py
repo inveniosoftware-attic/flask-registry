@@ -21,24 +21,13 @@
 ## granted to it by virtue of its status as an Intergovernmental Organization
 ## or submit itself to any jurisdiction.
 
-from unittest import TestCase
-from flask import Flask
+from __future__ import absolute_import
 
+import six
+
+from .helpers import FlaskTestCase, MockModule
 from flask.ext.registry import Registry, RegistryError, \
     ListRegistry, DictRegistry, ImportPathRegistry, ModuleRegistry
-
-
-class FlaskTestCase(TestCase):
-    """
-    Mix-in class for creating the Flask application
-    """
-
-    def setUp(self):
-        app = Flask(__name__)
-        app.config['DEBUG'] = True
-        app.config['TESTING'] = True
-        app.logger.disabled = True
-        self.app = app
 
 
 class TestListRegistry(FlaskTestCase):
@@ -109,6 +98,19 @@ class TestImportPathRegistry(FlaskTestCase):
             initial=['flask_registry.registries.*']
         )
         assert len(self.app.extensions['registry']['impns']) == 4
+        assert isinstance(
+            self.app.extensions['registry']['impns'][0], six.string_types
+        )
+
+    def test_load_modules(self):
+        Registry(app=self.app)
+        self.app.extensions['registry']['impns'] = ImportPathRegistry(
+            initial=['flask_registry.registries.*'], load_modules=True
+        )
+        assert len(self.app.extensions['registry']['impns']) == 4
+        assert not isinstance(
+            self.app.extensions['registry']['impns'][0], six.string_types
+        )
 
     def test_unregister(self):
         Registry(app=self.app)
@@ -121,26 +123,6 @@ class TestImportPathRegistry(FlaskTestCase):
             self.app.extensions['registry']['impns'].unregister,
             'flask_registry.*'
         )
-
-
-class MockModule(object):
-    def __init__(self):
-        self.called_setup = None
-        self.called_teardown = None
-
-    def setup(self):
-        self.called_setup = True
-
-    def teardown(self):
-        self.called_teardown = True
-
-    def assert_called(self):
-        assert self.called_setup is True
-        assert self.called_teardown is True
-
-    def assert_not_called(self):
-        assert self.called_setup is None
-        assert self.called_teardown is None
 
 
 class TestModuleRegistry(FlaskTestCase):
