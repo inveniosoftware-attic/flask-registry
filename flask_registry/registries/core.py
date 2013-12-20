@@ -21,6 +21,15 @@
 ## granted to it by virtue of its status as an Intergovernmental Organization
 ## or submit itself to any jurisdiction.
 
+"""
+Core registries
+===============
+
+The core registries are useful to use as subclasses for other more
+advanced registries. The provide the basic functionality for ``list`` and
+``dict`` style registries, as well as simple import path and module style
+registries.
+"""
 
 from __future__ import absolute_import
 
@@ -30,38 +39,96 @@ from flask_registry import RegistryBase, RegistryError
 
 class ListRegistry(RegistryBase):
     """
-    Basic registry that just keeps a list of items.
+    Basic registry that just keeps a list of objects. Provides normal
+    list-style access to the registry:
+
+    >>> from flask import Flask
+    >>> from flask_registry import Registry, ListRegistry
+    >>> app = Flask('myapp')
+    >>> r = Registry(app=app)
+    >>> r['myns'] = ListRegistry()
+    >>> r['myns'].register("something")
+    >>> len(r['myns'])
+    1
+    >>> r['myns'][0]
+    'something'
+    >>> "something" in r['myns']
+    True
+    >>> for obj in r['myns']:
+    ...     print(obj)
+    something
     """
     def __init__(self):
         self.registry = []
 
     def __iter__(self):
+        """ Get iterator """
         return self.registry.__iter__()
 
     def __len__(self):
+        """ Get number of object registered """
         return self.registry.__len__()
 
     def __contains__(self, item):
+        """
+        Check if an object has been registered.
+
+        :param item: Object instance
+        """
         return self.registry.__contains__(item)
 
     def __getitem__(self, idx):
+        """
+        Get registered object via indexing
+
+        :param idx: Index of object
+        """
         return self.registry[idx]
 
     def register(self, item):  # pylint: disable=W0221
+        """
+        Register a new object
+
+        :param item: Object to register
+        """
         self.registry.append(item)
 
     def unregister(self, item):  # pylint: disable=W0221
-        self.registry.remove(item)
+        """
+        Unregister an existing object. Raises a ``ValueError`` in case object
+        does not exists. If the same object was registered twice, only the
+        first registered object will be unregister.
 
+        :param item: Object to unregister
+        """
+        self.registry.remove(item)
 
 class DictRegistry(RegistryBase):
     """
-    Basic registry that just keeps a key, value pairs.
+    Basic registry that just keeps a key, value pairs. Provides normal
+    dict-style access to the registry:
+
+    >>> from flask import Flask
+    >>> from flask_registry import Registry, DictRegistry
+    >>> app = Flask('myapp')
+    >>> r = Registry(app=app)
+    >>> r['myns'] = DictRegistry()
+    >>> r['myns'].register("mykey", "something")
+    >>> len(r['myns'])
+    1
+    >>> r['myns']["mykey"]
+    'something'
+    >>> "mykey" in r['myns']
+    True
+    >>> for k, v in r['myns'].items():
+    ...     print("%s: %s" % (k,v))
+    mykey: something
     """
     def __init__(self):
         self.registry = {}
 
     def __iter__(self):
+        # pylint: disable=R0921
         return self.registry.__iter__()
 
     def __len__(self):
@@ -80,31 +147,58 @@ class DictRegistry(RegistryBase):
         return self.registry.__delitem__(key)
 
     def register(self, key, value):  # pylint: disable=W0221
+        """
+        Register a new object under a given key.
+
+        :param key: Key to register object under
+        :param item: Object to register
+        """
         if key in self.registry:
             raise RegistryError("Key %s already registered." % key)
         self.registry[key] = value
 
     def unregister(self, key):  # pylint: disable=W0221
+        """
+        Unregister an object under a given key. Raises ``KeyError`` in case
+        the given key doesn't exists.
+        """
         del self.registry[key]
 
     def items(self):
+        """
+        Get list of key/value pairs.
+
+        :param item: Object to register
+        """
         return self.registry.items()
 
 
 # pylint: disable=R0921
+# pylint: disable=R0922
 class ImportPathRegistry(ListRegistry):
     """
-    Import path registry
+    Registry of Python import paths. Supports simple discovery of modules
+    without loading them.
 
-    Example::
+    >>> from flask import Flask
+    >>> from flask_registry import Registry, ImportPathRegistry
+    >>> app = Flask('myapp')
+    >>> r = Registry(app=app)
+    >>> r['myns'] = ImportPathRegistry(initial=[
+    ... 'flask_registry.registries.*',
+    ... 'flask_registry'])
+    >>> for imp_path in r['myns']:
+    ...     print(imp_path)
+    flask_registry.registries.appdiscovery
+    flask_registry.registries.core
+    flask_registry.registries.modulediscovery
+    flask_registry.registries.pkgresources
+    flask_registry
 
-        registry = ImportPathRegistry(initial=[
-            'invenio.core.*',
-            'invenio.modules.record',
-        ])
 
-        for impstr in registry:
-            print impstr
+    :param initial: List of initial import paths.
+    :param load_modules: Load the modules instead of just registering the
+        import path. Defaults to ``False``.
     """
     def __init__(self, initial=None, load_modules=False):
         super(ImportPathRegistry, self).__init__()
@@ -113,28 +207,39 @@ class ImportPathRegistry(ListRegistry):
             for import_path in initial:
                 self.register(import_path)
 
-    def load_import_path(self, import_path):
+    def _load_import_path(self, import_path):
+        """ Load module behind an import path """
         return import_string(import_path) if self.load_modules else import_path
 
     def register(self, import_path):
+        """
+        Register a new import path
+
+        :param import_path: A full Python import path (e.g.
+            ``somepackge.somemodule``) or Python star import path to find all
+            modules inside a package (e.g. ``somepackge.*``).
+        """
         if import_path.endswith('.*'):
             for mod_path in find_modules(import_path[:-2],
                                          include_packages=True):
                 super(ImportPathRegistry, self).register(
-                    self.load_import_path(mod_path)
+                    self._load_import_path(mod_path)
                 )
         else:
             super(ImportPathRegistry, self).register(
-                self.load_import_path(import_path)
+                self._load_import_path(import_path)
             )
 
     def unregister(self, *args, **kwargs):
+        """
+        It is not possible to unregister import paths.
+        """
         raise NotImplementedError()
 
 
 class ModuleRegistry(ListRegistry):
     """
-    Registry for Python modules
+    Registry for Python modules with setup and teardown functionality.
 
     Each module may provide a ``setup()`` and ``teardown()`` function which
     will be called when the module is registered. The name of the methods
@@ -150,15 +255,29 @@ class ModuleRegistry(ListRegistry):
 
         registry = ModuleRegistry(with_setup=True)
         registry.register(mod, arg1, arg2, kw1=...)
+        # Will call mod.setup(arg1, arg2, kw1=...)
+
+    :param with_setup: Call setup/teardown function when
+        registering/unregistering modules. Defaults to ``True``.
     """
+
+    # pylint: disable=W0105
     setup_func_name = 'setup'
+    """ Name of setup function. Defaults to ``setup``."""
+
     teardown_func_name = 'teardown'
+    """ Name of teardown function. Defaults to ``teardown``."""
 
     def __init__(self, with_setup=True):
         super(ModuleRegistry, self).__init__()
         self.with_setup = with_setup
 
     def register(self, module, *args, **kwargs):
+        """
+        :param module: Module to register.
+        :param args: Argument passed to the module setup function.
+        :param kwargs: Keyword argument passed to the module setup function.
+        """
         super(ModuleRegistry, self).register(module)
         if self.with_setup:
             setup_func = getattr(module, self.setup_func_name, None)
@@ -166,6 +285,11 @@ class ModuleRegistry(ListRegistry):
                 setup_func(*args, **kwargs)
 
     def unregister(self, module, *args, **kwargs):
+        """
+        :param module: Module to unregister.
+        :param args: Argument passed to the module teardown function.
+        :param kwargs: Keyword argument passed to the module teardown function.
+        """
         super(ModuleRegistry, self).unregister(module)
         if self.with_setup:
             teardown_func = getattr(module, self.teardown_func_name, None)

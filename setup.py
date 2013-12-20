@@ -39,7 +39,9 @@ setup(
     license='GPLv2',
     author='Invenio collaboration',
     author_email='info@invenio-software.org',
-    description='Flask Registry',
+    description='Flask-Registry is an extension for Flask that allow '
+        'frameworks to dynamically assemble your Flask application from '
+        'reusable packages.',
     long_description=open('README.rst').read(),
     packages=['flask_registry', 'flask_registry.registries'],
     zip_safe=False,

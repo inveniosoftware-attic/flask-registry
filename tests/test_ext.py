@@ -23,6 +23,8 @@
 
 from __future__ import absolute_import
 
+import six
+
 from .helpers import FlaskTestCase
 from flask.ext.registry import Registry, RegistryError, RegistryBase, \
     RegistryProxy
@@ -146,6 +148,24 @@ class TestRegistryProxy(FlaskTestCase):
         with self.app.app_context():
             try:
                 proxy.register()
-                raise AssertionError("Registry is supposed not to be avialable")
+                raise AssertionError(
+                    "Registry is supposed not to be avialable"
+                )
             except RegistryError:
                 pass
+
+
+class TestExampleApp(FlaskTestCase):
+    def setUp(self):
+        from tests.example_app import create_app, Config
+        self.config = Config()
+        self.app = create_app(self.config)
+        self.app.config['DEBUG'] = True
+        self.app.config['TESTING'] = True
+        self.app.logger.disabled = True
+        self.client = self.app.test_client()
+
+    def test_blueprint_loaded(self):
+        # Test that app is loaded and that blueprints have been registered
+        response = self.client.get("/")
+        self.assertEqual(response.data, six.b("Hello from Flask-Registry"))

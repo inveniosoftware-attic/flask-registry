@@ -3,9 +3,7 @@
 API Docs
 ========
 
-Flask extension and registry proxy
-----------------------------------
-.. module:: flask_registry
+.. automodule:: flask_registry
 
 .. autoclass:: Registry
    :members:
@@ -16,9 +14,10 @@ Flask extension and registry proxy
 .. autoclass:: RegistryBase
    :members:
 
-Core Registries
----------------
-.. module:: flask_registry.registries.core
+.. autoclass:: RegistryError
+   :members:
+
+.. automodule:: flask_registry.registries.core
 
 .. autoclass:: ListRegistry
    :members:
@@ -32,22 +31,21 @@ Core Registries
 .. autoclass:: ModuleRegistry
    :members:
 
-Application Discovery
----------------------
-.. module:: flask_registry.registries.appdiscovery
-
-.. autoclass:: ExtensionRegistry
-   :members:
+.. automodule:: flask_registry.registries.appdiscovery
 
 .. autoclass:: PackageRegistry
+   :members:
+
+.. autoclass:: ExtensionRegistry
    :members:
 
 .. autoclass:: ConfigurationRegistry
    :members:
 
-Module Discovery
-----------------
-.. module:: flask_registry.registries.modulediscovery
+.. autoclass:: BlueprintAutoDiscoveryRegistry
+   :members:
+
+.. automodule:: flask_registry.registries.modulediscovery
 
 .. autoclass:: ModuleDiscoveryRegistry
    :members:
@@ -55,14 +53,12 @@ Module Discovery
 .. autoclass:: ModuleAutoDiscoveryRegistry
    :members:
 
-Package Resources
------------------
-.. module:: flask_registry.registries.pkgresources
+.. automodule:: flask_registry.registries.pkgresources
 
 .. autoclass:: EntryPointRegistry
    :members:
 
-.. autoclass:: PkgResourcesDiscoveryRegistry
+.. autoclass:: PkgResourcesDirDiscoveryRegistry
    :members:
 
 

@@ -1,24 +1,9 @@
-.. _apploading:
+.. automodule:: flask_registry
 
-Application Discovery
-=====================
+.. automodule:: flask_registry.registries.modulediscovery
 
-.. _discovery:
+.. automodule:: flask_registry.registries.appdiscovery
 
-Module Discovery
-================
+.. automodule:: flask_registry.registries.pkgresources
 
-.. _pkgresources:
-
-Package Resources
-=================
-
-.. _proxies:
-
-Registry Proxies
-================
-
-.. _extending:
-
-Extending Flask-Registry
-========================
+.. automodule:: flask_registry.registries

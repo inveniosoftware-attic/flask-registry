@@ -23,6 +23,9 @@
 
 """
 Version information for Flask-Registry
+
+This file is imported by ``flask_registry.__init__``, and parsed by
+``setup.py`` as well as ``docs/conf.py``.
 """
 
 # Do not change the format of this next line. Doing so risks breaking

@@ -28,7 +28,18 @@ Test file for BlueprintAutoDiscoverRegistry testing
 from flask import Blueprint
 
 blueprint = Blueprint('test', __name__)
+
 blueprints = [
     Blueprint('test1', __name__),
     Blueprint('test2', __name__)
 ]
+
+
+@blueprint.route("/", methods=['GET', ])
+def index():
+    from flask import current_app
+    if current_app.config['USER_CFG'] and current_app.config['DEFAULT_CFG'] \
+       and current_app.config['MOCKEXT']:
+        return "Hello from Flask-Registry"
+    else:
+        return "Not everything loaded"
