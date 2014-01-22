@@ -77,12 +77,6 @@ class TestRegistry(FlaskTestCase):
         except RegistryError:
             pass
 
-        try:
-            del self.app.extensions['registry']['mynamespace']
-            raise AssertionError("No exception raise for registry deletion")
-        except RegistryError:
-            pass
-
         # Registered object
         assert isinstance(
             self.app.extensions['registry']['mynamespace'],
@@ -99,6 +93,12 @@ class TestRegistry(FlaskTestCase):
 
         for ns, r in self.app.extensions['registry'].items():
             assert ns in ['mynamespace', 'myothernamespace']
+
+        # Removal
+        myregistry = self.app.extensions['registry']['mynamespace']
+        assert myregistry.namespace
+        del self.app.extensions['registry']['mynamespace']
+        assert myregistry.namespace is None
 
     def test_namespace_injection(self):
         Registry(app=self.app)

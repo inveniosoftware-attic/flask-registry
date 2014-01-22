@@ -127,12 +127,13 @@ class Registry(object):
 
     def __delitem__(self, key):
         """
-        Registries cannot be removed again. Method will raise a
-        ``RegistryError`` if invoked.
+        Remove a registry
 
         :param key: Namespace
         """
-        raise RegistryError("Registry cannot be deleted.")
+        obj = self._registry[key]
+        del self._registry[key]
+        obj.namespace = None
 
     def __setitem__(self, key, value):
         """
@@ -179,7 +180,7 @@ class RegistryBase(object):
     @namespace.setter
     def namespace(self, value):
         """ Setter for namespace property. """
-        if self._namespace:
+        if self._namespace and value is not None:
             raise RegistryError("Namespace cannot be changed.")
         self._namespace = value
 

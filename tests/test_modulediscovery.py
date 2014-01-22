@@ -120,6 +120,37 @@ class TestModuleDiscoveryRegistry(FlaskTestCase):
             )
             assert len(self.app.extensions['registry']['myns']) == 0
 
+    def test_syntaxerror_module(self):
+        Registry(app=self.app)
+
+        self.app.extensions['registry']['pathns'] = \
+            ImportPathRegistry(initial=['tests'])
+
+        self.app.extensions['registry']['myns'] = \
+            ModuleDiscoveryRegistry(
+                'syntaxerror_module',
+                registry_namespace='pathns',
+            )
+
+        with self.app.app_context():
+            self.assertRaises(
+                SyntaxError,
+                self.app.extensions['registry']['myns'].discover
+            )
+            assert len(self.app.extensions['registry']['myns']) == 0
+
+        # Silence the error
+        self.app.extensions['registry']['myns_silent'] = \
+            ModuleDiscoveryRegistry(
+                'syntaxerror_module',
+                registry_namespace='pathns',
+                silent=True,
+            )
+
+        with self.app.app_context():
+            self.app.extensions['registry']['myns_silent'].discover()
+            assert len(self.app.extensions['registry']['myns_silent']) == 0
+
     def test_modules_namespace(self):
         from flask_registry import registries
         Registry(app=self.app)

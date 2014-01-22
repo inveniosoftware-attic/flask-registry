@@ -58,7 +58,7 @@ class TestPackageRegistry(FlaskTestCase):
 
         self.assertEqual(
             len(self.app.extensions['registry']['packages']),
-            11
+            13
         )
 
 
@@ -100,4 +100,41 @@ class TestBlueprintAutoDiscoveryRegistry(FlaskTestCase):
         self.assertEqual(
             len(self.app.extensions['registry']['blueprints']),
             3
+        )
+
+    def test_import_error(self):
+        Registry(app=self.app)
+
+        self.app.extensions['registry']['packages'] = \
+            ImportPathRegistry(initial=['flask_registry'])
+
+        self.app.extensions['registry']['blueprints'] = \
+            BlueprintAutoDiscoveryRegistry(app=self.app)
+
+        self.assertEqual(
+            len(self.app.extensions['registry']['blueprints']),
+            0
+        )
+
+    def test_syntax_error(self):
+        Registry(app=self.app)
+
+        self.app.extensions['registry']['packages'] = \
+            ImportPathRegistry(initial=['tests'])
+
+        self.assertRaises(
+            SyntaxError,
+            BlueprintAutoDiscoveryRegistry,
+            app=self.app,
+            module_name='syntaxerror_views'
+        )
+
+        self.app.extensions['registry']['blueprints'] = \
+            BlueprintAutoDiscoveryRegistry(
+                app=self.app, module_name='syntaxerror_views', silent=True
+            )
+
+        self.assertEqual(
+            len(self.app.extensions['registry']['blueprints']),
+            0
         )

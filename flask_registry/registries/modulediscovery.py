@@ -181,23 +181,46 @@ class ModuleDiscoveryRegistry(ModuleRegistry):
         import_str = pkg + '.' + self.module_name
 
         try:
-            module = import_string(import_str, self.silent)
-            self.register(module)
+            module = import_string(import_str, silent=self.silent)
+            if module is not None:
+                self.register(module)
         except ImportError as e:  # pylint: disable=C0103
-            # If a module does not exists, it's not an error, however an
-            # ImportError generated from importing an existing module is an
-            # error.
-            try:
-                for found_module_name in find_modules(pkg):
-                    if found_module_name == import_str:
-                        reraise(
-                            ImportError,
-                            ImportError(*e.args),
-                            sys.exc_info()[2]
-                        )
-            except ValueError:
-                # pkg doesn't exist or is not a package
-                pass
+            self._handle_importerror(e, pkg, import_str)
+        except SyntaxError as e:
+            self._handle_syntaxerror(e, pkg, import_str)
+
+    def _handle_importerror(self, exception, pkg, import_str):
+        """
+        Properly handle an import error
+
+        If a module does not exists, it's not an error, however an
+        ImportError generated from importing an existing module is an
+        error.
+        """
+        try:
+            for found_module_name in find_modules(pkg):
+                if found_module_name == import_str:
+                    reraise(
+                        ImportError,
+                        ImportError(*exception.args),
+                        sys.exc_info()[2]
+                    )
+        except ValueError:
+            # pkg doesn't exist or is not a package
+            pass
+
+    def _handle_syntaxerror(self, exception, pkg, import_str):
+        """
+        Properly handle an syntax error.
+
+        Pass through the error unless silent is set to True.
+        """
+        if not self.silent:
+            reraise(
+                SyntaxError,
+                SyntaxError(*exception.args),
+                sys.exc_info()[2]
+            )
 
 
 class ModuleAutoDiscoveryRegistry(ModuleDiscoveryRegistry):
