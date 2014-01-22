@@ -263,7 +263,14 @@ class BlueprintAutoDiscoveryRegistry(ModuleAutoDiscoveryRegistry):
     def _discover_module(self, pkg):
         import_str = pkg + '.' + self.module_name
 
-        module = import_string(import_str)
+        try:
+            module = import_string(import_str, silent=self.silent)
+        except ImportError as e:  # pylint: disable=C0103
+            self._handle_importerror(e, pkg, import_str)
+            return
+        except SyntaxError as e:
+            self._handle_syntaxerror(e, pkg, import_str)
+            return
 
         candidates = []
         if 'blueprints' in dir(module):
