@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Flask-Registry
-## Copyright (C) 2013 CERN.
+## Copyright (C) 2013, 2014 CERN.
 ##
 ## Flask-Registry is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -94,7 +94,7 @@ from __future__ import absolute_import
 
 import os
 from werkzeug.utils import import_string
-from pkg_resources import iter_entry_points, resource_listdir
+from pkg_resources import iter_entry_points, resource_listdir, resource_isdir
 
 from .core import DictRegistry
 from .modulediscovery import ModuleAutoDiscoveryRegistry
@@ -142,8 +142,9 @@ class PkgResourcesDirDiscoveryRegistry(ModuleAutoDiscoveryRegistry):
         """
         Load list of files from resource directory.
         """
-        for filename in resource_listdir(pkg, self.module_name):
-            self.register(os.path.join(
-                os.path.dirname(import_string(pkg).__file__),
-                self.module_name, filename)
-            )
+        if resource_isdir(pkg, self.module_name):
+            for filename in resource_listdir(pkg, self.module_name):
+                self.register(os.path.join(
+                    os.path.dirname(import_string(pkg).__file__),
+                    self.module_name, filename)
+                )
