@@ -66,6 +66,8 @@ class TestConfigurationRegistry(FlaskTestCase):
     def test_registration(self):
         Registry(app=self.app)
 
+        initial_app_config_id = id(self.app.config)
+
         self.app.config['PACKAGES'] = ['tests']
         self.app.config['USER_CFG'] = True
 
@@ -85,6 +87,8 @@ class TestConfigurationRegistry(FlaskTestCase):
             NotImplementedError,
             self.app.extensions['registry']['config'].unregister
         )
+
+        assert initial_app_config_id == id(self.app.config)
 
 
 class TestBlueprintAutoDiscoveryRegistry(FlaskTestCase):

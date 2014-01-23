@@ -123,7 +123,7 @@ test2
 from __future__ import absolute_import
 
 from werkzeug.utils import import_string
-from flask import Blueprint
+from flask import Blueprint, Config
 
 from .core import ListRegistry, ImportPathRegistry
 from .modulediscovery import ModuleDiscoveryRegistry, \
@@ -207,7 +207,6 @@ class ConfigurationRegistry(ModuleDiscoveryRegistry):
         )
 
         # Create a new configuration module to collect configuration in.
-        from flask import Config
         self.new_config = Config(app.config.root_path)
 
         # Auto-discover configuration in packages
@@ -215,7 +214,7 @@ class ConfigurationRegistry(ModuleDiscoveryRegistry):
 
         # Overwrite default configuration with user specified configuration
         self.new_config.update(app.config)
-        app.config = self.new_config
+        app.config.update(self.new_config)
 
     def register(self, new_object):
         """
