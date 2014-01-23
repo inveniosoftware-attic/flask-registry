@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Flask-Registry
-## Copyright (C) 2013 CERN.
+## Copyright (C) 2013, 2014 CERN.
 ##
 ## Flask-Registry is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -43,6 +43,21 @@ class TestPkgResourcesDiscoveryRegistry(FlaskTestCase):
             )
 
         assert len(self.app.extensions['registry']['myns']) == 1
+
+    def test_missing_folder(self):
+        Registry(app=self.app)
+
+        self.app.extensions['registry']['pathns'] = \
+            ImportPathRegistry(initial=['tests'])
+
+        self.app.extensions['registry']['myns'] = \
+            PkgResourcesDirDiscoveryRegistry(
+                'non_existing_folder',
+                app=self.app,
+                registry_namespace='pathns',
+            )
+
+        assert len(self.app.extensions['registry']['myns']) == 0
 
 
 class TestEntryPointRegistry(FlaskTestCase):

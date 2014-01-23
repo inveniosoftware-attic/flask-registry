@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Flask-Registry
-## Copyright (C) 2013 CERN.
+## Copyright (C) 2013, 2014 CERN.
 ##
 ## Flask-Registry is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -232,7 +232,7 @@ class RegistryProxy(LocalProxy):
         initialization.
     """
 
-    # pylint: disable=W0142, C0111
+    # pylint: disable=W0142, C0111, E1002
     def __init__(self, namespace, registry_class, *args, **kwargs):
         def _lookup():
             if not 'registry' in getattr(current_app, 'extensions', {}):
