@@ -25,6 +25,9 @@ API Docs
 .. autoclass:: DictRegistry
    :members:
 
+.. autoclass:: SingletonRegistry
+   :members:
+
 .. autoclass:: ImportPathRegistry
    :members:
 

@@ -22,7 +22,7 @@
 ## or submit itself to any jurisdiction.
 
 """
-Core registries
+Core Registries
 ===============
 
 The core registries are useful to use as subclasses for other more
@@ -103,6 +103,7 @@ class ListRegistry(RegistryBase):
         """
         self.registry.remove(item)
 
+
 class DictRegistry(RegistryBase):
     """
     Basic registry that just keeps a key, value pairs. Provides normal
@@ -171,6 +172,58 @@ class DictRegistry(RegistryBase):
         :param item: Object to register
         """
         return self.registry.items()
+
+
+class SingletonRegistry(RegistryBase):
+    """
+    Basic registry that just keeps a single object.
+
+    >>> from flask_registry import SingletonRegistry
+    >>> app = Flask('myapp')
+    >>> r = Registry(app=app)
+    >>> r['singleton'] = SingletonRegistry()
+    >>> r['singleton'].register("test string")
+    >>> r['singleton'].get()
+    'test string'
+    >>> r['singleton'].register("another string")
+    Traceback (most recent call last):
+        ...
+    RegistryError: Object already registered.
+    >>> r['singleton'].unregister()
+    >>> r['singleton'].get() is None
+    True
+    >>> r['singleton'].unregister()
+    Traceback (most recent call last):
+        ...
+    RegistryError: No object to unregister.
+    """
+
+    def __init__(self):
+        self._singlton = None
+
+    def register(self, obj):
+        """
+        Register a new singleton object
+
+        :param obj: The object to register
+        """
+        if self._singlton is not None:
+            raise RegistryError("Object already registered.")
+        self._singlton = obj
+
+    def unregister(self):
+        """
+        Unregister the singleton object
+        """
+        if self._singlton is None:
+            raise RegistryError("No object to unregister.")
+        self._singlton = None
+
+    def get(self):
+        """
+        Get the registered object
+        """
+        return self._singlton
 
 
 # pylint: disable=R0921

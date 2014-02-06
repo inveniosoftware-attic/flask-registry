@@ -254,7 +254,7 @@ from .version import __version__
 # API of registries
 #
 from .registries.core import ListRegistry, DictRegistry, \
-    ImportPathRegistry, ModuleRegistry
+    ImportPathRegistry, ModuleRegistry, SingletonRegistry
 from .registries.modulediscovery import \
     ModuleDiscoveryRegistry, ModuleAutoDiscoveryRegistry
 from .registries.pkgresources import EntryPointRegistry, \
@@ -268,5 +268,5 @@ __all__ = [
     'ModuleDiscoveryRegistry', 'ModuleAutoDiscoveryRegistry',
     'EntryPointRegistry', 'PkgResourcesDirDiscoveryRegistry',
     'PackageRegistry', 'ExtensionRegistry', 'ConfigurationRegistry',
-    'BlueprintAutoDiscoveryRegistry', '__version__'
+    'BlueprintAutoDiscoveryRegistry', 'SingletonRegistry', '__version__'
 ]
