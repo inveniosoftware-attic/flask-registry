@@ -27,7 +27,8 @@ import six
 
 from .helpers import FlaskTestCase, MockModule
 from flask.ext.registry import Registry, RegistryError, \
-    ListRegistry, DictRegistry, ImportPathRegistry, ModuleRegistry
+    ListRegistry, DictRegistry, ImportPathRegistry, ModuleRegistry, \
+    SingletonRegistry
 
 
 class TestListRegistry(FlaskTestCase):
@@ -76,6 +77,28 @@ class TestDictRegistry(FlaskTestCase):
 
         del self.app.extensions['registry']['myns']['key1']
         assert len(self.app.extensions['registry']['myns']) == 0
+
+
+class TestSingletonRegistry(FlaskTestCase):
+    def test_registration(self):
+        Registry(app=self.app)
+        self.app.extensions['registry']['myns'] = SingletonRegistry()
+        self.app.extensions['registry']['myns'].register('item1')
+        assert self.app.extensions['registry']['myns'].get() == 'item1'
+
+        self.assertRaises(
+            RegistryError,
+            self.app.extensions['registry']['myns'].register,
+            'item 2'
+        )
+
+        self.app.extensions['registry']['myns'].unregister()
+        assert self.app.extensions['registry']['myns'].get() is None
+
+        self.assertRaises(
+            RegistryError,
+            self.app.extensions['registry']['myns'].unregister,
+        )
 
 
 class TestImportPathRegistry(FlaskTestCase):
