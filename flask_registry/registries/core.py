@@ -178,7 +178,8 @@ class SingletonRegistry(RegistryBase):
     """
     Basic registry that just keeps a single object.
 
-    >>> from flask_registry import SingletonRegistry
+    >>> from flask import Flask
+    >>> from flask_registry import Registry, SingletonRegistry
     >>> app = Flask('myapp')
     >>> r = Registry(app=app)
     >>> r['singleton'] = SingletonRegistry()
@@ -248,14 +249,28 @@ class ImportPathRegistry(ListRegistry):
     flask_registry.registries.pkgresources
     flask_registry
 
+    When using star imports it is sometimes useful to exclude certain imports:
+
+    >>> r['myns2'] = ImportPathRegistry(
+    ... initial=['flask_registry.registries.*',     ],
+    ... exclude=['flask_registry.registries.core']
+    ... )
+    >>> for imp_path in r['myns2']:
+    ...     print(imp_path)
+    flask_registry.registries.appdiscovery
+    flask_registry.registries.modulediscovery
+    flask_registry.registries.pkgresources
 
     :param initial: List of initial import paths.
+    :param exclude: A list of import paths to not register. Useful together
+        with star imports (``'*'``). Defaults to ``[]``.
     :param load_modules: Load the modules instead of just registering the
         import path. Defaults to ``False``.
     """
-    def __init__(self, initial=None, load_modules=False):
+    def __init__(self, initial=None, exclude=None, load_modules=False):
         super(ImportPathRegistry, self).__init__()
         self.load_modules = load_modules
+        self.exclude = exclude or []
         if initial:
             for import_path in initial:
                 self.register(import_path)
@@ -275,13 +290,15 @@ class ImportPathRegistry(ListRegistry):
         if import_path.endswith('.*'):
             for mod_path in find_modules(import_path[:-2],
                                          include_packages=True):
-                super(ImportPathRegistry, self).register(
-                    self._load_import_path(mod_path)
-                )
+                if mod_path not in self.exclude:
+                    super(ImportPathRegistry, self).register(
+                        self._load_import_path(mod_path)
+                    )
         else:
-            super(ImportPathRegistry, self).register(
-                self._load_import_path(import_path)
-            )
+            if import_path not in self.exclude:
+                super(ImportPathRegistry, self).register(
+                    self._load_import_path(import_path)
+                )
 
     def unregister(self, *args, **kwargs):
         """
