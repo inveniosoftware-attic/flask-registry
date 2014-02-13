@@ -135,6 +135,16 @@ class TestImportPathRegistry(FlaskTestCase):
             self.app.extensions['registry']['impns'][0], six.string_types
         )
 
+    def test_exclude(self):
+        Registry(app=self.app)
+        self.app.extensions['registry']['impns'] = ImportPathRegistry(
+            initial=['flask_registry.registries.*'],
+            exclude=['flask_registry.registries.pkgresources'],
+        )
+        assert len(self.app.extensions['registry']['impns']) == 3
+        assert 'flask_registry.registries.pkgresources' not in \
+            self.app.extensions['registry']['impns']
+
     def test_unregister(self):
         Registry(app=self.app)
         self.app.extensions['registry']['impns'] = ImportPathRegistry(

@@ -183,7 +183,8 @@ class PackageRegistry(ImportPathRegistry):
     """
     def __init__(self, app):
         super(PackageRegistry, self).__init__(
-            initial=app.config.get('PACKAGES', [])
+            initial=app.config.get('PACKAGES', []),
+            exclude=app.config.get('PACKAGES_EXCLUDE', [])
         )
 
 
