@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Flask-Registry
-## Copyright (C) 2013 CERN.
+## Copyright (C) 2013, 2014 CERN.
 ##
 ## Flask-Registry is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -33,71 +33,85 @@ from flask.ext.registry import Registry, RegistryError, \
 
 class TestListRegistry(FlaskTestCase):
     def test_registration(self):
-        Registry(app=self.app)
-        self.app.extensions['registry']['myns'] = ListRegistry()
-        self.app.extensions['registry']['myns'].register('item1')
-        self.app.extensions['registry']['myns'].register('item2')
+        r = Registry(app=self.app)
+        r['myns'] = ListRegistry()
+        r['myns'].register('item1')
+        r['myns'].register('item2')
 
-        assert len(self.app.extensions['registry']['myns']) == 2
-        assert 'item1' in self.app.extensions['registry']['myns']
-        assert 'notin' not in self.app.extensions['registry']['myns']
-        assert list(self.app.extensions['registry']['myns'])
+        assert len(r['myns']) == 2
+        assert 'item1' in r['myns']
+        assert 'notin' not in r['myns']
+        assert list(r['myns'])
 
-        self.app.extensions['registry']['myns'].unregister('item2')
-        assert len(self.app.extensions['registry']['myns']) == 1
-        assert 'item1' in self.app.extensions['registry']['myns']
-        assert 'item2' not in self.app.extensions['registry']['myns']
+        r['myns'].unregister('item2')
+        assert len(r['myns']) == 1
+        assert 'item1' in r['myns']
+        assert 'item2' not in r['myns']
 
 
 class TestDictRegistry(FlaskTestCase):
     def test_registration(self):
-        Registry(app=self.app)
-        self.app.extensions['registry']['myns'] = DictRegistry()
-        self.app.extensions['registry']['myns'].register('key1', 'item1')
-        self.app.extensions['registry']['myns']['key2'] = 'item2'
+        r = Registry(app=self.app)
+        r['myns'] = DictRegistry()
+        r['myns'].register('key1', 'item1')
+        r['myns']['key2'] = 'item2'
 
         self.assertRaises(
             RegistryError,
-            self.app.extensions['registry']['myns'].register,
+            r['myns'].register,
             'key2', 'item3'
         )
 
-        assert len(self.app.extensions['registry']['myns']) == 2
-        assert len(self.app.extensions['registry']['myns'].items()) == 2
-        assert 'key2' in self.app.extensions['registry']['myns']
-        assert 'notin' not in self.app.extensions['registry']['myns']
-        assert list(self.app.extensions['registry']['myns'])
+        assert len(r['myns']) == 2
+        assert len(r['myns'].items()) == 2
+        assert 'key2' in r['myns']
+        assert 'notin' not in r['myns']
+        assert list(r['myns'])
+        assert r['myns'].get("key1") == "item1"
+        assert r['myns'].get("key1", default='na') == "item1"
+        assert r['myns'].get("unknownkey", default='na') == "na"
+        assert r['myns'].get("unknownkey") is None
 
-        assert self.app.extensions['registry']['myns']['key2'] == 'item2'
+        assert r['myns']['key2'] == 'item2'
 
-        self.app.extensions['registry']['myns'].unregister('key2')
-        assert len(self.app.extensions['registry']['myns']) == 1
-        assert 'key1' in self.app.extensions['registry']['myns']
-        assert 'key2' not in self.app.extensions['registry']['myns']
+        r['myns'].unregister('key2')
+        assert len(r['myns']) == 1
+        assert 'key1' in r['myns']
+        assert 'key2' not in r['myns']
 
-        del self.app.extensions['registry']['myns']['key1']
-        assert len(self.app.extensions['registry']['myns']) == 0
+        del r['myns']['key1']
+        assert len(r['myns']) == 0
+
+    def test_six_usage(self):
+        r = Registry(app=self.app)
+        r['myns'] = DictRegistry()
+        r['myns'].register('key1', 'item1')
+        r['myns']['key2'] = 'item2'
+
+        assert list(six.iterkeys(r['myns'])) == list(r['myns'].keys())
+        assert list(six.itervalues(r['myns'])) == list(r['myns'].values())
+        assert list(six.iteritems(r['myns'])) == list(r['myns'].items())
 
 
 class TestSingletonRegistry(FlaskTestCase):
     def test_registration(self):
-        Registry(app=self.app)
-        self.app.extensions['registry']['myns'] = SingletonRegistry()
-        self.app.extensions['registry']['myns'].register('item1')
-        assert self.app.extensions['registry']['myns'].get() == 'item1'
+        r = Registry(app=self.app)
+        r['myns'] = SingletonRegistry()
+        r['myns'].register('item1')
+        assert r['myns'].get() == 'item1'
 
         self.assertRaises(
             RegistryError,
-            self.app.extensions['registry']['myns'].register,
+            r['myns'].register,
             'item 2'
         )
 
-        self.app.extensions['registry']['myns'].unregister()
-        assert self.app.extensions['registry']['myns'].get() is None
+        r['myns'].unregister()
+        assert r['myns'].get() is None
 
         self.assertRaises(
             RegistryError,
-            self.app.extensions['registry']['myns'].unregister,
+            r['myns'].unregister,
         )
 
 
