@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Flask-Registry
-## Copyright (C) 2013 CERN.
+## Copyright (C) 2013, 2014 CERN.
 ##
 ## Flask-Registry is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -172,6 +172,47 @@ class DictRegistry(RegistryBase):
         :param item: Object to register
         """
         return self.registry.items()
+
+    def get(self, key, default=None):
+        """
+        Get value of key.
+
+        :param key: key to fetch
+        :param default: default if key not found (optional)
+
+        :return: value of given key in dict
+        """
+        return self.registry.get(key, default)
+
+    def keys(self):
+        """
+        Get list of keys.
+        """
+        return self.registry.keys()
+
+    def values(self):
+        """
+        Get list of values.
+        """
+        return self.registry.values()
+
+    def iteritems(self):
+        """
+        Get iterator over list of key/value pairs.
+        """
+        return self.registry.iteritems()
+
+    def iterkeys(self):
+        """
+        Get iterator over list of keys.
+        """
+        return self.registry.iterkeys()
+
+    def itervalues(self):
+        """
+        Get iterator over list of keys.
+        """
+        return self.registry.itervalues()
 
 
 class SingletonRegistry(RegistryBase):
