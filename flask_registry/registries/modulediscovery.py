@@ -248,5 +248,7 @@ class ModuleAutoDiscoveryRegistry(ModuleDiscoveryRegistry):
             module_name, with_setup=with_setup, silent=silent,
             registry_namespace=registry_namespace
         )
+        if app is None and has_app_context():
+            app = current_app
         self.app = app
         self.discover(app=app)

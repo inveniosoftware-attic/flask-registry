@@ -217,3 +217,22 @@ class TestModuleAutoDiscoveryRegistry(FlaskTestCase):
         assert len(self.app.extensions['registry']['myns']) == 1
         from flask_registry.registries import appdiscovery
         assert self.app.extensions['registry']['myns'][0] == appdiscovery
+
+    def test_registry_proxy(self):
+        Registry(app=self.app)
+
+        self.app.extensions['registry']['pathns'] = \
+            ImportPathRegistry(initial=['flask_registry.*'])
+
+        myns = RegistryProxy(
+            'myns', ModuleAutoDiscoveryRegistry, 'appdiscovery',
+            registry_namespace='pathns'
+        )
+
+        with self.app.app_context():
+            assert len(self.app.extensions['registry']['pathns']) == 2
+            assert len(list(myns)) == 1
+            from flask_registry.registries import appdiscovery
+            assert myns[0] == appdiscovery
+
+
