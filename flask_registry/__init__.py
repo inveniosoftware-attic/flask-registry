@@ -52,6 +52,11 @@ from __future__ import absolute_import
 from werkzeug.local import LocalProxy
 from flask import current_app
 
+try:
+    from collections import MutableMapping
+except ImportError:
+    from collection.abc import MutableMapping
+
 
 class RegistryError(Exception):
     """
@@ -61,25 +66,38 @@ class RegistryError(Exception):
     pass
 
 
-class Registry(object):
+class Registry(MutableMapping):
     """
     Flask extension
 
     Initialization of the extension:
 
     >>> from flask import Flask
-    >>> from flask_registry import Registry, ListRegistry
+    >>> from flask_registry import Registry
     >>> app = Flask('myapp')
-    >>> r = Registry(app=app)
+    >>> r = Registry(app)
+    >>> app.extensions['registry']
+    <Registry ()>
 
     or alternatively using the factory pattern:
 
     >>> app = Flask('myapp')
     >>> r = Registry()
     >>> r.init_app(app)
+    >>> r
+    <Registry ()>
+
     """
+
     def __init__(self, app=None):
-        self._registry = dict()
+        """
+        Initialize the Registry.
+
+        :param app: Flask application
+        :type app: flask.Flask
+        """
+        super(MutableMapping, self).__init__()
+        self._registry = {}
         self.app = app
         if app is not None:
             self.init_app(app)
@@ -89,6 +107,10 @@ class Registry(object):
         Initialize a Flask application.
 
         Only one Registry per application is allowed.
+
+        :param app: Flask application
+        :type app: flask.Flask
+        :raise RegistryError: if the registry is already initialized
         """
         # Follow the Flask guidelines on usage of app.extensions
         if not hasattr(app, 'extensions'):
@@ -98,24 +120,12 @@ class Registry(object):
         app.extensions['registry'] = self
 
     def __iter__(self):
-        """
-        Get iterator over registries.
-        """
-        return self._registry.__iter__()
+        """Get iterator over registries."""
+        return iter(self._registry)
 
     def __len__(self):
-        """
-        Get number of registries.
-        """
-        return self._registry.__len__()
-
-    def __contains__(self, item):
-        """
-        Check if namespace exists in Flask application registry.
-
-        :param item: Namespace
-        """
-        return self._registry.__contains__(item)
+        """Get length of registries."""
+        return len(self._registry)
 
     def __getitem__(self, key):
         """
@@ -131,9 +141,8 @@ class Registry(object):
 
         :param key: Namespace
         """
-        obj = self._registry[key]
+        self._registry[key].namespace = None
         del self._registry[key]
-        obj.namespace = None
 
     def __setitem__(self, key, value):
         """
@@ -141,15 +150,17 @@ class Registry(object):
 
         :param key: Namespace
         :param value: Instance of RegistryBase or subclass
+        :raise RegistryError: if the key is already present
         """
         if key in self._registry:
             raise RegistryError("Namespace %s already taken." % key)
+        value.namespace = key
         self._registry[key] = value
-        self._registry[key].namespace = key
 
-    def items(self):
-        """ Get list of (namespace, registry)-pairs. """
-        return self._registry.items()
+    def __repr__(self):
+        """Get the string representation."""
+        return "<{0} ({1})>".format(self.__class__.__name__,
+                                    ", ".join(self._registry.keys()))
 
 
 # pylint: disable=R0921
