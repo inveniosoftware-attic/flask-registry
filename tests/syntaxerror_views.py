@@ -21,11 +21,10 @@
 ## granted to it by virtue of its status as an Intergovernmental Organization
 ## or submit itself to any jurisdiction.
 
-"""
-Test file for BlueprintAutoDiscoverRegistry testing of syntax errors.
-"""
+"""Test file for BlueprintAutoDiscoverRegistry testing of syntax errors."""
 
 from flask import Blueprint
+
 
 # SYNTAX ERROR IS ON PURPOSE
 blueprint = Blueprint('test', __name__

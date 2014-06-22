@@ -33,16 +33,16 @@ class TestModuleDiscoveryRegistry(FlaskTestCase):
     def test_registration(self):
         Registry(app=self.app)
 
-        self.app.extensions['registry']['pathns'] = \
-            ImportPathRegistry(initial=['flask_registry.*'])
+        self.app.extensions['registry'].update(
+            pathns=ImportPathRegistry(initial=['flask_registry.*'])
+        )
 
-        assert len(self.app.extensions['registry']['pathns']) == 2
+        self.assertEquals(3, len(self.app.extensions['registry']['pathns']))
 
         self.app.extensions['registry']['myns'] = \
             ModuleDiscoveryRegistry(
                 'appdiscovery',
-                registry_namespace='pathns'
-            )
+                registry_namespace='pathns')
 
         with self.app.app_context():
             self.app.extensions['registry']['myns'].discover()
@@ -72,14 +72,11 @@ class TestModuleDiscoveryRegistry(FlaskTestCase):
             'flask_registry.registries',
         ]
 
-        self.app.extensions['registry']['path.ns'] = \
-            ImportPathRegistry(initial=['flask_registry.*'])
-
-        self.app.extensions['registry']['myns'] = \
-            ModuleDiscoveryRegistry(
-                'appdiscovery',
-                registry_namespace='path.ns'
-            )
+        self.app.extensions['registry'].update({
+            'path.ns': ImportPathRegistry(initial=['flask_registry.*']),
+            'myns': ModuleDiscoveryRegistry('appdiscovery',
+                                            registry_namespace='path.ns')
+        })
 
         with self.app.app_context():
             self.app.extensions['registry']['myns'].discover()
@@ -88,14 +85,10 @@ class TestModuleDiscoveryRegistry(FlaskTestCase):
     def test_missing_module(self):
         Registry(app=self.app)
 
-        self.app.extensions['registry']['pathns'] = \
-            ImportPathRegistry(initial=['flask_registry.*'])
-
-        self.app.extensions['registry']['myns'] = \
-            ModuleDiscoveryRegistry(
-                'some_non_existing_module',
-                registry_namespace='pathns'
-            )
+        self.app.extensions['registry'].update(
+            pathns=ImportPathRegistry(initial=['flask_registry.*']),
+            myns=ModuleDiscoveryRegistry('some_non_existing_module',
+                                         registry_namespace='pathns'))
 
         with self.app.app_context():
             self.app.extensions['registry']['myns'].discover()
@@ -104,33 +97,23 @@ class TestModuleDiscoveryRegistry(FlaskTestCase):
     def test_broken_module(self):
         Registry(app=self.app)
 
-        self.app.extensions['registry']['pathns'] = \
-            ImportPathRegistry(initial=['tests'])
-
-        self.app.extensions['registry']['myns'] = \
-            ModuleDiscoveryRegistry(
-                'broken_module',
-                registry_namespace='pathns'
-            )
+        self.app.extensions['registry'].update(
+            pathns=ImportPathRegistry(initial=['tests']),
+            myns=ModuleDiscoveryRegistry('broken_module',
+                                         registry_namespace='pathns'))
 
         with self.app.app_context():
-            self.assertRaises(
-                ImportError,
-                self.app.extensions['registry']['myns'].discover
-            )
+            self.assertRaises(ImportError,
+                              self.app.extensions['registry']['myns'].discover)
             assert len(self.app.extensions['registry']['myns']) == 0
 
     def test_syntaxerror_module(self):
         Registry(app=self.app)
 
-        self.app.extensions['registry']['pathns'] = \
-            ImportPathRegistry(initial=['tests'])
-
-        self.app.extensions['registry']['myns'] = \
-            ModuleDiscoveryRegistry(
-                'syntaxerror_module',
-                registry_namespace='pathns',
-            )
+        self.app.extensions['registry'].update(
+            pathns=ImportPathRegistry(initial=['tests']),
+            myns=ModuleDiscoveryRegistry('syntaxerror_module',
+                                         registry_namespace='pathns'))
 
         with self.app.app_context():
             self.assertRaises(
@@ -141,11 +124,9 @@ class TestModuleDiscoveryRegistry(FlaskTestCase):
 
         # Silence the error
         self.app.extensions['registry']['myns_silent'] = \
-            ModuleDiscoveryRegistry(
-                'syntaxerror_module',
-                registry_namespace='pathns',
-                silent=True,
-            )
+            ModuleDiscoveryRegistry('syntaxerror_module',
+                                    registry_namespace='pathns',
+                                    silent=True)
 
         with self.app.app_context():
             self.app.extensions['registry']['myns_silent'].discover()
@@ -159,10 +140,8 @@ class TestModuleDiscoveryRegistry(FlaskTestCase):
         self.app.extensions['registry']['pathns'].register(registries)
 
         self.app.extensions['registry']['myns'] = \
-            ModuleDiscoveryRegistry(
-                'appdiscovery',
-                registry_namespace='pathns'
-            )
+            ModuleDiscoveryRegistry('appdiscovery',
+                                    registry_namespace='pathns')
 
         with self.app.app_context():
             self.app.extensions['registry']['myns'].discover()
@@ -183,13 +162,11 @@ class TestModuleDiscoveryRegistry(FlaskTestCase):
             assert 'pathns' not in self.app.extensions['registry']
 
             self.app.extensions['registry']['myns'] = \
-                ModuleDiscoveryRegistry(
-                    'appdiscovery',
-                    registry_namespace=proxy
-                )
+                ModuleDiscoveryRegistry('appdiscovery',
+                                        registry_namespace=proxy)
 
             assert 'pathns' in self.app.extensions['registry']
-            assert len(self.app.extensions['registry']['pathns']) == 2
+            self.assertEqual(3, len(self.app.extensions['registry']['pathns']))
 
             self.app.extensions['registry']['myns'].discover()
 
@@ -205,14 +182,12 @@ class TestModuleAutoDiscoveryRegistry(FlaskTestCase):
         self.app.extensions['registry']['pathns'] = \
             ImportPathRegistry(initial=['flask_registry.*'])
 
-        assert len(self.app.extensions['registry']['pathns']) == 2
+        self.assertEqual(3, len(self.app.extensions['registry']['pathns']))
 
         self.app.extensions['registry']['myns'] = \
-            ModuleAutoDiscoveryRegistry(
-                'appdiscovery',
-                app=self.app,
-                registry_namespace='pathns'
-            )
+            ModuleAutoDiscoveryRegistry('appdiscovery',
+                                        app=self.app,
+                                        registry_namespace='pathns')
 
         assert len(self.app.extensions['registry']['myns']) == 1
         from flask_registry.registries import appdiscovery
@@ -230,9 +205,7 @@ class TestModuleAutoDiscoveryRegistry(FlaskTestCase):
         )
 
         with self.app.app_context():
-            assert len(self.app.extensions['registry']['pathns']) == 2
-            assert len(list(myns)) == 1
+            self.assertEqual(3, len(self.app.extensions['registry']['pathns']))
+            self.assertEqual(1, len(list(myns)))
             from flask_registry.registries import appdiscovery
-            assert myns[0] == appdiscovery
-
-
+            self.assertEqual(appdiscovery, myns[0])

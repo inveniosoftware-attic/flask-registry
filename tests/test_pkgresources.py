@@ -24,40 +24,36 @@
 from __future__ import absolute_import
 
 from .helpers import FlaskTestCase
-from flask.ext.registry import Registry, PkgResourcesDirDiscoveryRegistry, \
-    ImportPathRegistry, EntryPointRegistry, RegistryBase
+from flask.ext.registry import (Registry, RegistryBase,
+                                PkgResourcesDirDiscoveryRegistry,
+                                ImportPathRegistry, EntryPointRegistry)
 
 
 class TestPkgResourcesDiscoveryRegistry(FlaskTestCase):
+
     def test_registration(self):
         Registry(app=self.app)
 
-        self.app.extensions['registry']['pathns'] = \
-            ImportPathRegistry(initial=['tests'])
+        self.app.extensions['registry'].update(
+            pathns=ImportPathRegistry(initial=['tests']))
+        self.app.extensions['registry'].update(
+            myns=PkgResourcesDirDiscoveryRegistry('resources',
+                                                  app=self.app,
+                                                  registry_namespace='pathns'))
 
-        self.app.extensions['registry']['myns'] = \
-            PkgResourcesDirDiscoveryRegistry(
-                'resources',
-                app=self.app,
-                registry_namespace='pathns'
-            )
-
-        assert len(self.app.extensions['registry']['myns']) == 1
+        self.assertEquals(1, len(self.app.extensions['registry']['myns']))
 
     def test_missing_folder(self):
         Registry(app=self.app)
 
-        self.app.extensions['registry']['pathns'] = \
-            ImportPathRegistry(initial=['tests'])
+        self.app.extensions['registry'].update(
+            pathns=ImportPathRegistry(initial=['tests']))
+        self.app.extensions['registry'].update(
+            myns=PkgResourcesDirDiscoveryRegistry('non_existing_folder',
+                                                  app=self.app,
+                                                  registry_namespace='pathns'))
 
-        self.app.extensions['registry']['myns'] = \
-            PkgResourcesDirDiscoveryRegistry(
-                'non_existing_folder',
-                app=self.app,
-                registry_namespace='pathns',
-            )
-
-        assert len(self.app.extensions['registry']['myns']) == 0
+        self.assertEquals(0, len(self.app.extensions['registry']['myns']))
 
 
 class TestEntryPointRegistry(FlaskTestCase):

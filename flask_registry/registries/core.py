@@ -34,13 +34,13 @@ registries.
 from __future__ import absolute_import
 
 from werkzeug.utils import find_modules, import_string
-from flask_registry import RegistryBase, RegistryError
 
 try:
     from collections import Sequence, MutableMapping
 except ImportError:
     from collections.abs import Sequence, MutableMapping
 
+from ..base import RegistryBase, RegistryError
 
 
 class ListRegistry(RegistryBase, Sequence):

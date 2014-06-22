@@ -24,11 +24,13 @@
 from __future__ import absolute_import
 
 from .helpers import FlaskTestCase
-from flask_registry import Registry, ExtensionRegistry, PackageRegistry, \
-    ConfigurationRegistry, ImportPathRegistry, BlueprintAutoDiscoveryRegistry
+from flask_registry import (Registry, ExtensionRegistry, PackageRegistry,
+                            ConfigurationRegistry, ImportPathRegistry,
+                            BlueprintAutoDiscoveryRegistry)
 
 
 class TestExtensionRegistry(FlaskTestCase):
+
     def test_registration(self):
         Registry(app=self.app)
 
@@ -43,8 +45,7 @@ class TestExtensionRegistry(FlaskTestCase):
 
         self.assertRaises(
             NotImplementedError,
-            self.app.extensions['registry']['extensions'].unregister
-        )
+            self.app.extensions['registry']['extensions'].unregister)
 
 
 class TestPackageRegistry(FlaskTestCase):
@@ -133,10 +134,11 @@ class TestBlueprintAutoDiscoveryRegistry(FlaskTestCase):
             module_name='syntaxerror_views'
         )
 
-        self.app.extensions['registry']['blueprints'] = \
-            BlueprintAutoDiscoveryRegistry(
-                app=self.app, module_name='syntaxerror_views', silent=True
-            )
+        self.app.extensions['registry'].update(
+            blueprints=BlueprintAutoDiscoveryRegistry(
+                app=self.app,
+                module_name='syntaxerror_views',
+                silent=True))
 
         self.assertEqual(
             len(self.app.extensions['registry']['blueprints']),

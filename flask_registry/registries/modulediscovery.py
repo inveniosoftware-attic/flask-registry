@@ -87,7 +87,7 @@ from werkzeug.utils import find_modules, import_string
 from werkzeug._compat import reraise
 from flask import current_app, has_app_context
 
-from flask_registry import RegistryProxy, RegistryBase, RegistryError
+from ..base import RegistryProxy, RegistryBase, RegistryError
 from .core import ModuleRegistry
 
 
