@@ -34,10 +34,16 @@ registries.
 from __future__ import absolute_import
 
 from werkzeug.utils import find_modules, import_string
-from flask_registry import RegistryBase, RegistryError
+
+try:
+    from collections import Sequence, MutableMapping
+except ImportError:
+    from collections.abs import Sequence, MutableMapping
+
+from ..base import RegistryBase, RegistryError
 
 
-class ListRegistry(RegistryBase):
+class ListRegistry(RegistryBase, Sequence):
     """
     Basic registry that just keeps a list of objects. Provides normal
     list-style access to the registry:
@@ -59,15 +65,16 @@ class ListRegistry(RegistryBase):
     something
     """
     def __init__(self):
+        super(ListRegistry, self).__init__()
         self.registry = []
 
     def __iter__(self):
         """ Get iterator """
-        return self.registry.__iter__()
+        return iter(self.registry)
 
     def __len__(self):
         """ Get number of object registered """
-        return self.registry.__len__()
+        return len(self.registry)
 
     def __contains__(self, item):
         """
@@ -75,7 +82,7 @@ class ListRegistry(RegistryBase):
 
         :param item: Object instance
         """
-        return self.registry.__contains__(item)
+        return item in self.registry
 
     def __getitem__(self, idx):
         """
@@ -104,7 +111,7 @@ class ListRegistry(RegistryBase):
         self.registry.remove(item)
 
 
-class DictRegistry(RegistryBase):
+class DictRegistry(RegistryBase, MutableMapping):
     """
     Basic registry that just keeps a key, value pairs. Provides normal
     dict-style access to the registry:
@@ -126,17 +133,17 @@ class DictRegistry(RegistryBase):
     mykey: something
     """
     def __init__(self):
+        super(DictRegistry, self).__init__()
         self.registry = {}
 
     def __iter__(self):
-        # pylint: disable=R0921
-        return self.registry.__iter__()
+        return iter(self.registry)
 
     def __len__(self):
-        return self.registry.__len__()
+        return len(self.registry)
 
     def __contains__(self, item):
-        return self.registry.__contains__(item)
+        return item in self.registry
 
     def __getitem__(self, key):
         return self.registry[key]
@@ -165,55 +172,6 @@ class DictRegistry(RegistryBase):
         """
         del self.registry[key]
 
-    def items(self):
-        """
-        Get list of key/value pairs.
-
-        :param item: Object to register
-        """
-        return self.registry.items()
-
-    def get(self, key, default=None):
-        """
-        Get value of key.
-
-        :param key: key to fetch
-        :param default: default if key not found (optional)
-
-        :return: value of given key in dict
-        """
-        return self.registry.get(key, default)
-
-    def keys(self):
-        """
-        Get list of keys.
-        """
-        return self.registry.keys()
-
-    def values(self):
-        """
-        Get list of values.
-        """
-        return self.registry.values()
-
-    def iteritems(self):
-        """
-        Get iterator over list of key/value pairs.
-        """
-        return self.registry.iteritems()
-
-    def iterkeys(self):
-        """
-        Get iterator over list of keys.
-        """
-        return self.registry.iterkeys()
-
-    def itervalues(self):
-        """
-        Get iterator over list of keys.
-        """
-        return self.registry.itervalues()
-
 
 class SingletonRegistry(RegistryBase):
     """
@@ -241,7 +199,7 @@ class SingletonRegistry(RegistryBase):
     """
 
     def __init__(self):
-        self._singlton = None
+        self._singleton = None
 
     def register(self, obj):
         """
@@ -249,23 +207,23 @@ class SingletonRegistry(RegistryBase):
 
         :param obj: The object to register
         """
-        if self._singlton is not None:
+        if self._singleton is not None:
             raise RegistryError("Object already registered.")
-        self._singlton = obj
+        self._singleton = obj
 
     def unregister(self):
         """
         Unregister the singleton object
         """
-        if self._singlton is None:
+        if self._singleton is None:
             raise RegistryError("No object to unregister.")
-        self._singlton = None
+        self._singleton = None
 
     def get(self):
         """
         Get the registered object
         """
-        return self._singlton
+        return self._singleton
 
 
 # pylint: disable=R0921
