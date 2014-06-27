@@ -4,6 +4,21 @@ Changelog
 Here you can see the full list of changes between each Flask-Registry
 release.
 
+Version 0.2.0 (released 2014-06-27)
+-----------------------------------
+- ListRegistry now fuly behaves as a list.
+- DictRegistry now fuly behaves as a dict.
+- Fixes issue with app in ModuleAutoDiscoveryRegistry.
+- Excludes option for ImportPathRegistry.
+- Fixes handling of missing package resource directory.
+- Fixes issue in configuration loading.
+- Allows removal of registries.
+- Fixes ImportError and SyntaxError handling.
+- Documentation and code coverage improvements.
+- Differentiates between missing and broken modules.
+- New BlueprintAutoDiscoveryRegistry.
+- New SingletonRegistry.
+
 Version 0.1
 -----------
 - Initial public release

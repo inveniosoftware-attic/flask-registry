@@ -31,4 +31,4 @@ This file is imported by ``flask_registry.__init__``, and parsed by
 # Do not change the format of this next line. Doing so risks breaking
 # setup.py and docs/conf.py
 
-__version__ = "0.2.0.dev20140625"
+__version__ = "0.2.0"
