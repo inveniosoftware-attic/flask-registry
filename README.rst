@@ -6,10 +6,10 @@ Flask-Registry
     :target: https://travis-ci.org/inveniosoftware/flask-registry
 .. image:: https://coveralls.io/repos/inveniosoftware/flask-registry/badge.png?branch=master
     :target: https://coveralls.io/r/inveniosoftware/flask-registry
-.. image:: https://pypip.in/v/flask-registry/badge.png
-   :target: https://crate.io/packages/flask-registry/
-.. image:: https://pypip.in/d/flask-registry/badge.png
-   :target: https://crate.io/packages/flask-registry/
+.. image:: https://pypip.in/v/Flask-Registry/badge.png
+   :target: https://pypi.python.org/pypi/Flask-Registry/
+.. image:: https://pypip.in/d/Flask-Registry/badge.png
+   :target: https://pypi.python.org/pypi/Flask-Registry/
 
 Installation
 ============
