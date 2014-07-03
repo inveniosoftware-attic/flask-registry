@@ -1,12 +1,18 @@
-**Flask-Registry** is an extension for Flask that allow frameworks to
-dynamically assemble your Flask application from reusable packages consisting
-of blueprints, extensions, and configuration.
+================
+ Flask-Registry
+================
+
+Flask-Registry
+==============
 
 .. image:: https://travis-ci.org/inveniosoftware/flask-registry.png?branch=master
     :target: https://travis-ci.org/inveniosoftware/flask-registry
 .. image:: https://coveralls.io/repos/inveniosoftware/flask-registry/badge.png?branch=master
     :target: https://coveralls.io/r/inveniosoftware/flask-registry
 
+Flask-Registry is a Flask extension that allows frameworks to
+dynamically assemble Flask application from reusable packages
+consisting of blueprints, extensions, and configurations.
 
 User's Guide
 ============
@@ -23,7 +29,7 @@ Flask-Registry with Flask.
 
 
 API Reference
-============
+=============
 
 If you are looking for information on a specific function, class or
 method, this part of the documentation is for you.
