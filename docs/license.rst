@@ -23,4 +23,4 @@ The full license text can be found below (:ref:`gpl`).
 GNU General Public License
 --------------------------
 
-.. include:: ../COPYING
+.. literalinclude:: ../COPYING

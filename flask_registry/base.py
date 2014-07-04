@@ -88,7 +88,8 @@ class Registry(MutableMapping):
 
         :param app: Flask application
         :type app: flask.Flask
-        :raise RegistryError: if the registry is already initialized
+        :raise flask_registry.RegistryError: if the registry is already
+                                             initialized
         """
         # Follow the Flask guidelines on usage of app.extensions
         if not hasattr(app, 'extensions'):
@@ -128,7 +129,7 @@ class Registry(MutableMapping):
 
         :param key: Namespace
         :param value: Instance of RegistryBase or subclass
-        :raise RegistryError: if the key is already present
+        :raise flask_registry.RegistryError: if the key is already present
         """
         if key in self._registry:
             raise RegistryError("Namespace %s already taken." % key)

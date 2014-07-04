@@ -22,6 +22,8 @@
 ## or submit itself to any jurisdiction.
 
 """
+Core registries.
+
 Core Registries
 ===============
 
@@ -40,30 +42,36 @@ try:
 except ImportError:
     from collections.abs import Sequence, MutableMapping
 
-from ..base import RegistryBase, RegistryError
+from .. import RegistryBase, RegistryError
 
 
 class ListRegistry(RegistryBase, Sequence):
-    """
-    Basic registry that just keeps a list of objects. Provides normal
-    list-style access to the registry:
 
-    >>> from flask import Flask
-    >>> from flask_registry import Registry, ListRegistry
-    >>> app = Flask('myapp')
-    >>> r = Registry(app=app)
-    >>> r['myns'] = ListRegistry()
-    >>> r['myns'].register("something")
-    >>> len(r['myns'])
-    1
-    >>> r['myns'][0]
-    'something'
-    >>> "something" in r['myns']
-    True
-    >>> for obj in r['myns']:
-    ...     print(obj)
-    something
     """
+    Basic registry that just keeps a list of objects.
+
+    Provides normal list-style access to the registry:
+
+    .. doctest::
+
+        >>> from flask import Flask
+        >>> from flask_registry import Registry, ListRegistry
+        >>> app = Flask('myapp')
+        >>> r = Registry(app=app)
+        >>> r['myns'] = ListRegistry()
+        >>> r['myns'].register("something")
+        >>> len(r['myns'])
+        1
+        >>> r['myns'][0]
+        'something'
+        >>> "something" in r['myns']
+        True
+        >>> for obj in r['myns']:
+        ...     print(obj)
+        something
+
+    """
+
     def __init__(self):
         super(ListRegistry, self).__init__()
         self.registry = []
@@ -112,26 +120,32 @@ class ListRegistry(RegistryBase, Sequence):
 
 
 class DictRegistry(RegistryBase, MutableMapping):
-    """
-    Basic registry that just keeps a key, value pairs. Provides normal
-    dict-style access to the registry:
 
-    >>> from flask import Flask
-    >>> from flask_registry import Registry, DictRegistry
-    >>> app = Flask('myapp')
-    >>> r = Registry(app=app)
-    >>> r['myns'] = DictRegistry()
-    >>> r['myns'].register("mykey", "something")
-    >>> len(r['myns'])
-    1
-    >>> r['myns']["mykey"]
-    'something'
-    >>> "mykey" in r['myns']
-    True
-    >>> for k, v in r['myns'].items():
-    ...     print("%s: %s" % (k,v))
-    mykey: something
     """
+    Basic registry that just keeps a key, value pairs.
+
+    Provides normal dict-style access to the registry:
+
+    .. doctest::
+
+        >>> from flask import Flask
+        >>> from flask_registry import Registry, DictRegistry
+        >>> app = Flask('myapp')
+        >>> r = Registry(app=app)
+        >>> r['myns'] = DictRegistry()
+        >>> r['myns'].register("mykey", "something")
+        >>> len(r['myns'])
+        1
+        >>> r['myns']["mykey"]
+        'something'
+        >>> "mykey" in r['myns']
+        True
+        >>> for k, v in r['myns'].items():
+        ...     print("%s: %s" % (k,v))
+        mykey: something
+
+    """
+
     def __init__(self):
         super(DictRegistry, self).__init__()
         self.registry = {}
@@ -174,28 +188,32 @@ class DictRegistry(RegistryBase, MutableMapping):
 
 
 class SingletonRegistry(RegistryBase):
+
     """
     Basic registry that just keeps a single object.
 
-    >>> from flask import Flask
-    >>> from flask_registry import Registry, SingletonRegistry
-    >>> app = Flask('myapp')
-    >>> r = Registry(app=app)
-    >>> r['singleton'] = SingletonRegistry()
-    >>> r['singleton'].register("test string")
-    >>> r['singleton'].get()
-    'test string'
-    >>> r['singleton'].register("another string")
-    Traceback (most recent call last):
-        ...
-    RegistryError: Object already registered.
-    >>> r['singleton'].unregister()
-    >>> r['singleton'].get() is None
-    True
-    >>> r['singleton'].unregister()
-    Traceback (most recent call last):
-        ...
-    RegistryError: No object to unregister.
+    .. doctest::
+
+        >>> from flask import Flask
+        >>> from flask_registry import Registry, SingletonRegistry
+        >>> app = Flask('myapp')
+        >>> r = Registry(app=app)
+        >>> r['singleton'] = SingletonRegistry()
+        >>> r['singleton'].register("test string")
+        >>> r['singleton'].get()
+        'test string'
+        >>> r['singleton'].register("another string")
+        Traceback (most recent call last):
+            ...
+        RegistryError: Object already registered.
+        >>> r['singleton'].unregister()
+        >>> r['singleton'].get() is None
+        True
+        >>> r['singleton'].unregister()
+        Traceback (most recent call last):
+            ...
+        RegistryError: No object to unregister.
+
     """
 
     def __init__(self):
@@ -226,46 +244,52 @@ class SingletonRegistry(RegistryBase):
         return self._singleton
 
 
-# pylint: disable=R0921
-# pylint: disable=R0922
 class ImportPathRegistry(ListRegistry):
-    """
-    Registry of Python import paths. Supports simple discovery of modules
-    without loading them.
 
-    >>> from flask import Flask
-    >>> from flask_registry import Registry, ImportPathRegistry
-    >>> app = Flask('myapp')
-    >>> r = Registry(app=app)
-    >>> r['myns'] = ImportPathRegistry(initial=[
-    ... 'flask_registry.registries.*',
-    ... 'flask_registry'])
-    >>> for imp_path in r['myns']:
-    ...     print(imp_path)
-    flask_registry.registries.appdiscovery
-    flask_registry.registries.core
-    flask_registry.registries.modulediscovery
-    flask_registry.registries.pkgresources
-    flask_registry
+    """
+    Registry of Python import paths.
+
+    Supports simple discovery of modules without loading them.
+
+    .. doctest::
+
+        >>> from flask import Flask
+        >>> from flask_registry import Registry, ImportPathRegistry
+        >>> app = Flask('myapp')
+        >>> r = Registry(app=app)
+        >>> r['myns'] = ImportPathRegistry(initial=[
+        ... 'flask_registry.registries.*',
+        ... 'flask_registry'])
+        >>> for imp_path in r['myns']:
+        ...     print(imp_path)
+        flask_registry.registries.appdiscovery
+        flask_registry.registries.core
+        flask_registry.registries.modulediscovery
+        flask_registry.registries.pkgresources
+        flask_registry
 
     When using star imports it is sometimes useful to exclude certain imports:
 
-    >>> r['myns2'] = ImportPathRegistry(
-    ... initial=['flask_registry.registries.*',     ],
-    ... exclude=['flask_registry.registries.core']
-    ... )
-    >>> for imp_path in r['myns2']:
-    ...     print(imp_path)
-    flask_registry.registries.appdiscovery
-    flask_registry.registries.modulediscovery
-    flask_registry.registries.pkgresources
+    .. doctest::
+
+        >>> r['myns2'] = ImportPathRegistry(
+        ... initial=['flask_registry.registries.*',     ],
+        ... exclude=['flask_registry.registries.core']
+        ... )
+        >>> for imp_path in r['myns2']:
+        ...     print(imp_path)
+        flask_registry.registries.appdiscovery
+        flask_registry.registries.modulediscovery
+        flask_registry.registries.pkgresources
 
     :param initial: List of initial import paths.
     :param exclude: A list of import paths to not register. Useful together
         with star imports (``'*'``). Defaults to ``[]``.
     :param load_modules: Load the modules instead of just registering the
         import path. Defaults to ``False``.
+
     """
+
     def __init__(self, initial=None, exclude=None, load_modules=False):
         super(ImportPathRegistry, self).__init__()
         self.load_modules = load_modules
@@ -280,7 +304,7 @@ class ImportPathRegistry(ListRegistry):
 
     def register(self, import_path):
         """
-        Register a new import path
+        Register a new import path.
 
         :param import_path: A full Python import path (e.g.
             ``somepackge.somemodule``) or Python star import path to find all
@@ -300,13 +324,12 @@ class ImportPathRegistry(ListRegistry):
                 )
 
     def unregister(self, *args, **kwargs):
-        """
-        It is not possible to unregister import paths.
-        """
+        """It is not possible to unregister import paths."""
         raise NotImplementedError()
 
 
 class ModuleRegistry(ListRegistry):
+
     """
     Registry for Python modules with setup and teardown functionality.
 
@@ -318,7 +341,9 @@ class ModuleRegistry(ListRegistry):
     Any extra arguments and keyword arguments to ``register`` and
     ``unregister`` is passed to the setup and teardown functions.
 
-    Example::
+    Example:
+
+    .. code-block:: python
 
         import mod
 
@@ -330,7 +355,6 @@ class ModuleRegistry(ListRegistry):
         registering/unregistering modules. Defaults to ``True``.
     """
 
-    # pylint: disable=W0105
     setup_func_name = 'setup'
     """ Name of setup function. Defaults to ``setup``."""
 
@@ -343,6 +367,8 @@ class ModuleRegistry(ListRegistry):
 
     def register(self, module, *args, **kwargs):
         """
+        TODO.
+
         :param module: Module to register.
         :param args: Argument passed to the module setup function.
         :param kwargs: Keyword argument passed to the module setup function.
@@ -355,6 +381,8 @@ class ModuleRegistry(ListRegistry):
 
     def unregister(self, module, *args, **kwargs):
         """
+        TODO.
+
         :param module: Module to unregister.
         :param args: Argument passed to the module teardown function.
         :param kwargs: Keyword argument passed to the module teardown function.

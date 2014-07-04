@@ -40,8 +40,10 @@ sys.path.append(os.path.abspath('_themes'))
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = ['sphinx.ext.autodoc', 'sphinx.ext.coverage',
-              'sphinx.ext.doctest']
+extensions = ['sphinx.ext.autodoc',
+              'sphinx.ext.coverage',
+              'sphinx.ext.doctest',
+              'sphinx.ext.intersphinx']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -150,7 +152,7 @@ html_theme_options = {
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+#html_static_path = ['_static']
 
 # If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
 # using the given strftime format.
@@ -275,3 +277,16 @@ texinfo_documents = [
 
 # If true, do not generate a @detailmenu in the "Top" node's menu.
 #texinfo_no_detailmenu = False
+
+# -- Options for Intersphinx mapping ------------------------------------------
+
+# See <http://sphinx-doc.org/ext/intersphinx.html>
+intersphinx_mapping = {
+    'flask': ('http://flask.pocoo.org/docs/', None),
+    'werkzeug': ('http://werkzeug.pocoo.org/docs/', None),
+}
+
+if sys.version_info < (3,):
+    intersphinx_mapping['python'] = ('https://docs.python.org/2.7/', None)
+else:
+    intersphinx_mapping['python'] = ('https://docs.python.org/3.4/', None)
