@@ -30,10 +30,11 @@ python:
 
 install:
   - pip install --upgrade pip  --use-mirrors
-  - pip install coveralls --use-mirrors
+  - pip install coveralls sphinx --use-mirrors
   - pip install .
 
 script:
+  - sphinx-build -qnNW docs docs/_build/html
   - coverage run --source=flask_registry setup.py test
 
 after_success:

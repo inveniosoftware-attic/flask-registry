@@ -5,10 +5,19 @@
 Flask-Registry
 ==============
 
-.. image:: https://travis-ci.org/inveniosoftware/flask-registry.png?branch=master
-    :target: https://travis-ci.org/inveniosoftware/flask-registry
-.. image:: https://coveralls.io/repos/inveniosoftware/flask-registry/badge.png?branch=master
-    :target: https://coveralls.io/r/inveniosoftware/flask-registry
+
+.. raw:: html
+
+    <p style="height:22px; margin:0 0 0 2em; float:right">
+        <a href="https://travis-ci.org/inveniosoftware/flask-registry">
+            <img src="https://travis-ci.org/inveniosoftware/flask-registry.png?branch=master"
+                 alt="travis-ci badge"/>
+        </a>,
+        <a href="https://coveralls.io/r/inveniosoftware/flask-registry">
+            <img src="https://coveralls.io/repos/inveniosoftware/flask-registry/badge.png?branch=master"
+                 alt="coveralls.io badge"/>
+        </a>
+    </p>
 
 Flask-Registry is a Flask extension that allows frameworks to
 dynamically assemble Flask application from reusable packages

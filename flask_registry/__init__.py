@@ -21,7 +21,8 @@
 ## granted to it by virtue of its status as an Intergovernmental Organization
 ## or submit itself to any jurisdiction.
 
-"""Flask extension.
+"""
+Flask extension to dynamically assemble your Flask application from packages.
 
 Flask-Registry is initialized like this:
 

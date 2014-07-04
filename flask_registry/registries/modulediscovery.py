@@ -22,61 +22,70 @@
 ## or submit itself to any jurisdiction.
 
 """
-Module Discovery
-================
-The module discovery registries provide discovery functionality useful
-for searching a list of Python packages for a specific module name, and
-afterwards registering the module. This is used to e.g. load and register
-Flask blueprints by ``BlueprintAutoDiscoveryRegistry``.
+The module discovery registries.
+
+They provide discovery functionality useful for searching a list of Python
+packages for a specific module name, and afterwards registering the module.
+This is used to e.g. load and register Flask blueprints by
+``BlueprintAutoDiscoveryRegistry``.
 
 Assume e.g. we want to discover the ``helpers`` module from the ``tests``
 package. First we initialize the registry:
 
->>> from flask import Flask
->>> from flask_registry import Registry, ModuleDiscoveryRegistry
->>> from flask_registry import ImportPathRegistry
->>> app = Flask('myapp')
->>> r = Registry(app=app)
+.. doctest::
+
+    >>> from flask import Flask
+    >>> from flask_registry import Registry, ModuleDiscoveryRegistry
+    >>> from flask_registry import ImportPathRegistry
+    >>> app = Flask('myapp')
+    >>> r = Registry(app=app)
 
 We then create the list of packages to search through using an
 ``ImportPathRegistry``:
 
->>> r['mypackages'] = ImportPathRegistry(initial=['tests'])
+.. doctest::
+
+    >>> r['mypackages'] = ImportPathRegistry(initial=['tests'])
 
 Then, initialize the ``ModuleDiscoveryRegistry`` and run the discovery:
 
->>> r['mydiscoveredmodules'] = ModuleDiscoveryRegistry(
-...     'helpers', registry_namespace='mypackages')
->>> len(r['mydiscoveredmodules'])
-0
->>> r['mydiscoveredmodules'].discover(app=app)
->>> len(r['mydiscoveredmodules'])
-1
+.. doctest::
+
+    >>> r['mydiscoveredmodules'] = ModuleDiscoveryRegistry(
+    ...     'helpers', registry_namespace='mypackages')
+    >>> len(r['mydiscoveredmodules'])
+    0
+    >>> r['mydiscoveredmodules'].discover(app=app)
+    >>> len(r['mydiscoveredmodules'])
+    1
 
 Lazy discovery
 ^^^^^^^^^^^^^^
 Using ``RegistryProxy`` you may lazily discover modules. Above example using
 lazy loading looks like this:
 
->>> from flask_registry import RegistryProxy
->>> app = Flask('myapp')
->>> r = Registry(app=app)
->>> pkg_proxy = RegistryProxy('mypackages', ImportPathRegistry,
-...     initial=['tests'])
->>> mod_proxy = RegistryProxy('mydiscoveredmodules',
-...     ModuleDiscoveryRegistry,
-...     'helpers',
-...     registry_namespace=pkg_proxy)
->>> 'mypackages' in r
-False
->>> 'mydiscoveredmodules' in r
-False
->>> with app.app_context():
-...     mod_proxy.discover(app=app)
->>> 'mypackages' in r
-True
->>> 'mydiscoveredmodules' in r
-True
+.. doctest::
+
+    >>> from flask_registry import RegistryProxy
+    >>> app = Flask('myapp')
+    >>> r = Registry(app=app)
+    >>> pkg_proxy = RegistryProxy('mypackages', ImportPathRegistry,
+    ...     initial=['tests'])
+    >>> mod_proxy = RegistryProxy('mydiscoveredmodules',
+    ...     ModuleDiscoveryRegistry,
+    ...     'helpers',
+    ...     registry_namespace=pkg_proxy)
+    >>> 'mypackages' in r
+    False
+    >>> 'mydiscoveredmodules' in r
+    False
+    >>> with app.app_context():
+    ...     mod_proxy.discover(app=app)
+    >>> 'mypackages' in r
+    True
+    >>> 'mydiscoveredmodules' in r
+    True
+
 """
 
 from __future__ import absolute_import
@@ -87,11 +96,12 @@ from werkzeug.utils import find_modules, import_string
 from werkzeug._compat import reraise
 from flask import current_app, has_app_context
 
-from ..base import RegistryProxy, RegistryBase, RegistryError
+from .. import RegistryProxy, RegistryBase, RegistryError
 from .core import ModuleRegistry
 
 
 class ModuleDiscoveryRegistry(ModuleRegistry):
+
     """
     Specialized ``ModuleRegistry`` that will search a list of Python packages
     in an ``ImportPathRegistry`` or ``ModuleRegistry`` for a specific module
@@ -127,6 +137,8 @@ class ModuleDiscoveryRegistry(ModuleRegistry):
     def __init__(self, module_name, registry_namespace=None, with_setup=False,
                  silent=False):
         """
+        TODO.
+
         :param module_name: Name of module to look for in packages
         :param registry_namespace: Name of registry containing the package
             registry. Defaults to ``packages''.
@@ -147,8 +159,10 @@ class ModuleDiscoveryRegistry(ModuleRegistry):
 
     def discover(self, app=None):
         """
-        Perform module discovery, by iterating over the list of Python packages
-        in the order they are specified.
+        Perform module discovery.
+
+        It does so by iterating over the list of Python packages in the order
+        they are specified.
 
         :param app: Flask application object from where the list of Python
             packages is loaded (from the ``registry_namespace``). Defaults to
@@ -176,7 +190,9 @@ class ModuleDiscoveryRegistry(ModuleRegistry):
 
     def _discover_module(self, pkg):
         """
-        Method to discover a single module. May be overwritten by subclasses.
+        Method to discover a single module.
+
+        May be overwritten by subclasses.
         """
         import_str = pkg + '.' + self.module_name
 
@@ -191,10 +207,10 @@ class ModuleDiscoveryRegistry(ModuleRegistry):
 
     def _handle_importerror(self, exception, pkg, import_str):
         """
-        Properly handle an import error
+        Handle properly an import error.
 
         If a module does not exists, it's not an error, however an
-        ImportError generated from importing an existing module is an
+        :py:exc:`ImportError` generated from importing an existing module is an
         error.
         """
         try:
@@ -211,7 +227,7 @@ class ModuleDiscoveryRegistry(ModuleRegistry):
 
     def _handle_syntaxerror(self, exception, pkg, import_str):
         """
-        Properly handle an syntax error.
+        Handle properly an syntax error.
 
         Pass through the error unless silent is set to True.
         """
@@ -241,7 +257,6 @@ class ModuleAutoDiscoveryRegistry(ModuleDiscoveryRegistry):
         ``False``.
     """
 
-    # pylint: disable=R0913
     def __init__(self, module_name, app=None, registry_namespace=None,
                  with_setup=False, silent=False):
         super(ModuleAutoDiscoveryRegistry, self).__init__(
