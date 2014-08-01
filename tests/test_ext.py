@@ -167,10 +167,11 @@ class TestExampleApp(FlaskTestCase):
         self.client = self.app.test_client()
 
 
-    # The following test is known to fail on Python 3.4.0 while it
-    # works well on lesser or higher Pythons.  (Additionally cannot
-    # use unittest.skipIf() here due to Python-2.6.)
-    if sys.version_info != (3, 4, 0, 'final', 0):
+    # The following test is known to fail on Python 3.4.0 and 3.4.1
+    # while it works well on lesser or higher Pythons.  (Additionally
+    # cannot use unittest.skipIf() here due to Python-2.6.)
+    if sys.version_info != (3, 4, 0, 'final', 0) and \
+       sys.version_info != (3, 4, 1, 'final', 0):
         def test_blueprint_loaded(self):
             # Test that app is loaded and that blueprints have been registered
             response = self.client.get("/")
