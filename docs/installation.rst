@@ -17,7 +17,7 @@ The development version can be downloaded from `its page at GitHub
     $ git clone https://github.com/inveniosoftware/flask-registry.git
     $ cd flask-registry
     $ python setup.py develop
-    $ source run-tests.sh
+    $ ./run-tests.sh
 
 Requirements
 ------------
