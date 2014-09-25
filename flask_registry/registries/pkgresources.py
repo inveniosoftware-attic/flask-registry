@@ -95,13 +95,22 @@ class EntryPointRegistry(DictRegistry):
     :param entry_point_ns: Entry point namespace
     :param load: if False, entry point will not be loaded. Defaults to
         ``True``.
+    :param initial: List of initial names. If ``None`` it defaults to all.
+    :param exclude: A list of names to not register. Useful together
+        with initial equals to ``None``. Defaults to ``[]``.
     """
 
-    def __init__(self, entry_point_ns, load=True):
+    def __init__(self, entry_point_ns, load=True, initial=None, exclude=None):
         super(EntryPointRegistry, self).__init__()
         self.load = load
-        for entry_point_group in iter_entry_points(entry_point_ns):
-            self.register(entry_point_group)
+        self.initial = initial or [None]
+        self.exclude = set(exclude or [])
+        for name in self.initial:
+            for entry_point_group in iter_entry_points(entry_point_ns,
+                                                       name=name):
+                if entry_point_group.name in self.exclude:
+                    continue
+                self.register(entry_point_group)
 
     def register(self, entry_point):  # pylint: disable=W0221
         """

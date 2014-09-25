@@ -99,6 +99,8 @@ setup(
     entry_points={
         'flask_registry.test_entry': [
             'testcase = flask_registry:RegistryBase',
+            'registry = flask_registry:Registry',
+            'proxy = flask_registry:RegistryProxy',
         ]
     },
     tests_require=tests_require,

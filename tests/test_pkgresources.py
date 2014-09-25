@@ -10,7 +10,7 @@
 from __future__ import absolute_import
 
 from .helpers import FlaskTestCase
-from flask.ext.registry import (Registry, RegistryBase,
+from flask.ext.registry import (Registry, RegistryBase, RegistryProxy,
                                 PkgResourcesDirDiscoveryRegistry,
                                 ImportPathRegistry, EntryPointRegistry)
 
@@ -49,7 +49,7 @@ class TestEntryPointRegistry(FlaskTestCase):
         self.app.extensions['registry']['myns'] = \
             EntryPointRegistry('flask_registry.test_entry')
 
-        self.assertEqual(len(self.app.extensions['registry']['myns']), 1)
+        self.assertEqual(len(self.app.extensions['registry']['myns']), 3)
         assert 'testcase' in self.app.extensions['registry']['myns']
 
     def test_load(self):
@@ -58,6 +58,32 @@ class TestEntryPointRegistry(FlaskTestCase):
         self.app.extensions['registry']['myns'] = \
             EntryPointRegistry('flask_registry.test_entry', load=True)
 
-        self.assertEqual(len(self.app.extensions['registry']['myns']), 1)
+        self.assertEqual(len(self.app.extensions['registry']['myns']), 3)
         assert RegistryBase == \
             self.app.extensions['registry']['myns']['testcase'][0]
+
+    def test_initial_load(self):
+        Registry(app=self.app)
+
+        self.app.extensions['registry']['myns'] = \
+            EntryPointRegistry('flask_registry.test_entry', load=True,
+                               initial=['registry', 'proxy'])
+
+        self.assertEqual(len(self.app.extensions['registry']['myns']), 2)
+        self.assertEqual(self.app.extensions['registry']['myns']['registry'][0],
+                         Registry)
+        self.assertEqual(self.app.extensions['registry']['myns']['proxy'][0],
+                         RegistryProxy)
+
+    def test_exclude_load(self):
+        Registry(app=self.app)
+
+        self.app.extensions['registry']['myns'] = \
+            EntryPointRegistry('flask_registry.test_entry', load=True,
+                               exclude=['testcase'])
+
+        self.assertEqual(len(self.app.extensions['registry']['myns']), 2)
+        self.assertEqual(self.app.extensions['registry']['myns']['registry'][0],
+                         Registry)
+        self.assertEqual(self.app.extensions['registry']['myns']['proxy'][0],
+                         RegistryProxy)
