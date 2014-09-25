@@ -98,13 +98,16 @@ class EntryPointRegistry(DictRegistry):
     :param initial: List of initial names. If ``None`` it defaults to all.
     :param exclude: A list of names to not register. Useful together
         with initial equals to ``None``. Defaults to ``[]``.
+    :param unique: Allow only unique options in entry point group if ``True``.
     """
 
-    def __init__(self, entry_point_ns, load=True, initial=None, exclude=None):
+    def __init__(self, entry_point_ns, load=True, initial=None, exclude=None,
+                 unique=False):
         super(EntryPointRegistry, self).__init__()
         self.load = load
         self.initial = initial or [None]
         self.exclude = set(exclude or [])
+        self.unique = unique
         for name in self.initial:
             for entry_point_group in iter_entry_points(entry_point_ns,
                                                        name=name):
@@ -113,16 +116,22 @@ class EntryPointRegistry(DictRegistry):
                 self.register(entry_point_group)
 
     def register(self, entry_point):  # pylint: disable=W0221
-        """
-        Register a new entry point
+        """Register a new entry point
 
         :param entry_point: The entry point
         """
-        if entry_point.name not in self.registry:
-            self.registry[entry_point.name] = []
-        self.registry[entry_point.name].append(
-            entry_point.load() if self.load else entry_point
-        )
+        value = entry_point.load() if self.load else entry_point
+        is_registered =  entry_point.name in self.registry
+        if self.unique:
+            if is_registered:
+                raise RuntimeError("{0} is already registered".format(
+                    entry_point.name
+                ))
+            self.registry[entry_point.name] = value
+        else:
+            if not is_registered:
+                self.registry[entry_point.name] = []
+            self.registry[entry_point.name].append(value)
 
 
 class PkgResourcesDirDiscoveryRegistry(ModuleAutoDiscoveryRegistry):
