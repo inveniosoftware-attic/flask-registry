@@ -23,7 +23,7 @@ class TestModuleDiscoveryRegistry(FlaskTestCase):
             pathns=ImportPathRegistry(initial=['flask_registry.*'])
         )
 
-        self.assertEquals(3, len(self.app.extensions['registry']['pathns']))
+        self.assertEquals(4, len(self.app.extensions['registry']['pathns']))
 
         self.app.extensions['registry']['myns'] = \
             ModuleDiscoveryRegistry(
@@ -152,7 +152,7 @@ class TestModuleDiscoveryRegistry(FlaskTestCase):
                                         registry_namespace=proxy)
 
             assert 'pathns' in self.app.extensions['registry']
-            self.assertEqual(3, len(self.app.extensions['registry']['pathns']))
+            self.assertEqual(4, len(self.app.extensions['registry']['pathns']))
 
             self.app.extensions['registry']['myns'].discover()
 
@@ -168,7 +168,7 @@ class TestModuleAutoDiscoveryRegistry(FlaskTestCase):
         self.app.extensions['registry']['pathns'] = \
             ImportPathRegistry(initial=['flask_registry.*'])
 
-        self.assertEqual(3, len(self.app.extensions['registry']['pathns']))
+        self.assertEqual(4, len(self.app.extensions['registry']['pathns']))
 
         self.app.extensions['registry']['myns'] = \
             ModuleAutoDiscoveryRegistry('appdiscovery',
@@ -191,7 +191,7 @@ class TestModuleAutoDiscoveryRegistry(FlaskTestCase):
         )
 
         with self.app.app_context():
-            self.assertEqual(3, len(self.app.extensions['registry']['pathns']))
+            self.assertEqual(4, len(self.app.extensions['registry']['pathns']))
             self.assertEqual(1, len(list(myns)))
             from flask_registry.registries import appdiscovery
             self.assertEqual(appdiscovery, myns[0])
