@@ -17,12 +17,13 @@ python:
 
 install:
   - pip install --upgrade pip
+  - pip install pytest pytest-pep8 pytest-cov pytest-cache
   - pip install coveralls sphinx
   - pip install .
 
 script:
   - sphinx-build -qnNW docs docs/_build/html
-  - coverage run --source=flask_registry setup.py test
+  - python setup.py test
 
 after_success:
   - coveralls

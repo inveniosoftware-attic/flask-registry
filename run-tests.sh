@@ -7,5 +7,4 @@
 ## modify it under the terms of the Revised BSD License; see LICENSE
 ## file for more details.
 
-coverage run setup.py test
-coverage report -m
+python setup.py test
