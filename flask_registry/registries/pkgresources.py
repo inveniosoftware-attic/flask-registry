@@ -121,7 +121,7 @@ class EntryPointRegistry(DictRegistry):
         :param entry_point: The entry point
         """
         value = entry_point.load() if self.load else entry_point
-        is_registered =  entry_point.name in self.registry
+        is_registered = entry_point.name in self.registry
         if self.unique:
             if is_registered:
                 raise RuntimeError("{0} is already registered".format(
