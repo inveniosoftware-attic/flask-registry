@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
-##
-## This file is part of Flask-Registry
-## Copyright (C) 2013, 2014 CERN.
-##
-## Flask-Registry is free software; you can redistribute it and/or
-## modify it under the terms of the Revised BSD License; see LICENSE
-## file for more details.
+#
+# This file is part of Flask-Registry
+# Copyright (C) 2013, 2014, 2015 CERN.
+#
+# Flask-Registry is free software; you can redistribute it and/or
+# modify it under the terms of the Revised BSD License; see LICENSE
+# file for more details.
 
 from __future__ import absolute_import
 
@@ -151,7 +151,6 @@ class TestExampleApp(FlaskTestCase):
         self.app.config['TESTING'] = True
         self.app.logger.disabled = True
         self.client = self.app.test_client()
-
 
     # The following test is known to fail on Python 3.4.0 and 3.4.1
     # while it works well on lesser or higher Pythons.  (Additionally
