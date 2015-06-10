@@ -93,7 +93,7 @@ config:
 Blueprints
 ^^^^^^^^^^
 The ``BlueprintAutoDiscoveryRegistry`` will search for blueprints defined
-inside a ``views`` module in each package defined in ``PACAKGES``. It will
+inside a ``views`` module in each package defined in ``PACKAGES``. It will
 also register the discovered blueprints on the Flask application.
 Each ``views`` module should define either a single blueprint in the variable
 ``blueprint`` and/or multiple blueprints in the variable ``blueprints``:
@@ -172,7 +172,7 @@ class PackageRegistry(ImportPathRegistry):
     Specialized ``ImportPathRegistry`` that takes the initial list of import
     paths from the ``PACKAGES`` configuration variable in the application.
 
-    :param app: The Flask application object from which includes a ``PACAKGES``
+    :param app: The Flask application object from which includes a ``PACKAGES``
         variable in it's configuration.
     """
     def __init__(self, app):
