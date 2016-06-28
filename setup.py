@@ -65,7 +65,7 @@ setup(
     url='http://github.com/inveniosoftware/flask-registry/',
     license='BSD',
     author='Invenio collaboration',
-    author_email='info@invenio-software.org',
+    author_email='info@inveniosoftware.org',
     description='Flask-Registry is an extension for Flask that allow '
         'frameworks to dynamically assemble your Flask application from '
         'reusable packages consisting of blueprints, extensions, and '
