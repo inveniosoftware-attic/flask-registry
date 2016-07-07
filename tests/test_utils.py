@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Flask-Registry
-# Copyright (C) 2013, 2014 CERN.
+# Copyright (C) 2014, 2016 CERN.
 #
 # Flask-Registry is free software; you can redistribute it and/or
 # modify it under the terms of the Revised BSD License; see LICENSE
@@ -10,12 +10,11 @@
 from __future__ import absolute_import
 
 import sys
+from unittest import TestCase
+
 import six
 
-from unittest import TestCase
-from flask.ext.registry.utils import (
-    resolve_dependencies, depends, uses
-)
+from flask_registry.utils import depends, resolve_dependencies, uses
 
 
 class TestUtils(TestCase):

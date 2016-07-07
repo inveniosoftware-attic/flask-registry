@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Flask-Registry
-# Copyright (C) 2013, 2014, 2015 CERN.
+# Copyright (C) 2013, 2014, 2016 CERN.
 #
 # Flask-Registry is free software; you can redistribute it and/or
 # modify it under the terms of the Revised BSD License; see LICENSE
@@ -9,10 +9,10 @@
 
 from __future__ import absolute_import
 
-from .helpers import FlaskTestCase
-from flask_registry import (Registry, ExtensionRegistry, PackageRegistry,
-                            ConfigurationRegistry, ImportPathRegistry,
-                            BlueprintAutoDiscoveryRegistry)
+from flask_registry import (BlueprintAutoDiscoveryRegistry,
+                            ConfigurationRegistry, ExtensionRegistry,
+                            ImportPathRegistry, PackageRegistry, Registry)
+from helpers import FlaskTestCase
 
 
 class TestExtensionRegistry(FlaskTestCase):
@@ -20,7 +20,7 @@ class TestExtensionRegistry(FlaskTestCase):
     def test_registration(self):
         Registry(app=self.app)
 
-        self.app.config['EXTENSIONS'] = ['tests.mockext']
+        self.app.config['EXTENSIONS'] = ['registry_module.mockext']
 
         assert 'MOCKEXT' not in self.app.config
 
@@ -38,14 +38,14 @@ class TestPackageRegistry(FlaskTestCase):
     def test_registration(self):
         Registry(app=self.app)
 
-        self.app.config['PACKAGES'] = ['tests.*']
+        self.app.config['PACKAGES'] = ['registry_module.*']
 
         self.app.extensions['registry']['packages'] = \
             PackageRegistry(self.app)
 
         self.assertEqual(
             len(self.app.extensions['registry']['packages']),
-            14
+            8
         )
 
 
@@ -55,7 +55,7 @@ class TestConfigurationRegistry(FlaskTestCase):
 
         initial_app_config_id = id(self.app.config)
 
-        self.app.config['PACKAGES'] = ['tests']
+        self.app.config['PACKAGES'] = ['registry_module']
         self.app.config['USER_CFG'] = True
 
         self.app.extensions['registry']['packages'] = \
@@ -83,7 +83,7 @@ class TestBlueprintAutoDiscoveryRegistry(FlaskTestCase):
         Registry(app=self.app)
 
         self.app.extensions['registry']['packages'] = \
-            ImportPathRegistry(initial=['tests'])
+            ImportPathRegistry(initial=['registry_module'])
 
         self.app.extensions['registry']['blueprints'] = \
             BlueprintAutoDiscoveryRegistry(app=self.app)
@@ -111,7 +111,7 @@ class TestBlueprintAutoDiscoveryRegistry(FlaskTestCase):
         Registry(app=self.app)
 
         self.app.extensions['registry']['packages'] = \
-            ImportPathRegistry(initial=['tests'])
+            ImportPathRegistry(initial=['registry_module'])
 
         self.assertRaises(
             SyntaxError,

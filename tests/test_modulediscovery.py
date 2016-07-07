@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Flask-Registry
-# Copyright (C) 2013, 2014, 2015 CERN.
+# Copyright (C) 2013, 2014, 2016 CERN.
 #
 # Flask-Registry is free software; you can redistribute it and/or
 # modify it under the terms of the Revised BSD License; see LICENSE
@@ -9,10 +9,10 @@
 
 from __future__ import absolute_import
 
-from .helpers import FlaskTestCase
-from flask.ext.registry import Registry, ModuleDiscoveryRegistry, \
-    ImportPathRegistry, RegistryProxy, RegistryError, \
-    ModuleAutoDiscoveryRegistry, ModuleRegistry
+from flask_registry import (ImportPathRegistry, ModuleAutoDiscoveryRegistry,
+                            ModuleDiscoveryRegistry, ModuleRegistry, Registry,
+                            RegistryError, RegistryProxy)
+from helpers import FlaskTestCase
 
 
 class TestModuleDiscoveryRegistry(FlaskTestCase):
@@ -84,7 +84,7 @@ class TestModuleDiscoveryRegistry(FlaskTestCase):
         Registry(app=self.app)
 
         self.app.extensions['registry'].update(
-            pathns=ImportPathRegistry(initial=['tests']),
+            pathns=ImportPathRegistry(initial=['registry_module']),
             myns=ModuleDiscoveryRegistry('broken_module',
                                          registry_namespace='pathns'))
 
@@ -97,7 +97,7 @@ class TestModuleDiscoveryRegistry(FlaskTestCase):
         Registry(app=self.app)
 
         self.app.extensions['registry'].update(
-            pathns=ImportPathRegistry(initial=['tests']),
+            pathns=ImportPathRegistry(initial=['registry_module']),
             myns=ModuleDiscoveryRegistry('syntaxerror_module',
                                          registry_namespace='pathns'))
 

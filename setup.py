@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Flask-Registry
-# Copyright (C) 2013, 2014, 2015, 2016 CERN.
+# Copyright (C) 2013, 2014, 2016 CERN.
 #
 # Flask-Registry is free software; you can redistribute it and/or
 # modify it under the terms of the Revised BSD License; see LICENSE
@@ -21,13 +21,27 @@ with open(os.path.join('flask_registry', 'version.py'), 'rt') as f:
     ).group('version')
 
 tests_require = [
+    'check-manifest>=0.25',
+    'coverage>=4.0',
+    'isort>=4.2.2',
+    'mock>=1.3.0',
+    'pydocstyle>=1.0.0',
     'pytest-cache>=1.0',
     'pytest-cov>=1.8.0',
     'pytest-pep8>=1.0.6',
     'pytest>=2.8.0',
-    'coverage',
-    'mock',
 ]
+
+extras_require = {
+    'docs': [
+        'Sphinx>=1.4.2',
+    ],
+    'tests': tests_require,
+}
+
+extras_require['all'] = []
+for reqs in extras_require.values():
+    extras_require['all'].extend(reqs)
 
 setup(
     name='Flask-Registry',
@@ -45,6 +59,7 @@ setup(
     zip_safe=False,
     include_package_data=True,
     platforms='any',
+    extras_require=extras_require,
     install_requires=[
         'Flask',
         'six',

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Flask-Registry
-# Copyright (C) 2013, 2014, 2015 CERN.
+# Copyright (C) 2013, 2014, 2016 CERN.
 #
 # Flask-Registry is free software; you can redistribute it and/or
 # modify it under the terms of the Revised BSD License; see LICENSE
@@ -11,10 +11,10 @@ from __future__ import absolute_import
 
 import six
 
-from .helpers import FlaskTestCase, MockModule
-from flask.ext.registry import Registry, RegistryError, \
-    ListRegistry, DictRegistry, ImportPathRegistry, ModuleRegistry, \
-    SingletonRegistry
+from flask_registry import (DictRegistry, ImportPathRegistry, ListRegistry,
+                            ModuleRegistry, Registry, RegistryError,
+                            SingletonRegistry)
+from helpers import FlaskTestCase, MockModule
 
 
 class TestListRegistry(FlaskTestCase):

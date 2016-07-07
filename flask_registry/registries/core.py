@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Flask-Registry
-# Copyright (C) 2013, 2014, 2015 CERN.
+# Copyright (C) 2013, 2014, 2016 CERN.
 #
 # Flask-Registry is free software; you can redistribute it and/or
 # modify it under the terms of the Revised BSD License; see LICENSE
@@ -23,18 +23,16 @@ from __future__ import absolute_import
 
 from werkzeug.utils import find_modules, import_string
 
+from .. import RegistryBase, RegistryError
+
 try:
     from collections import Sequence, MutableMapping
 except ImportError:
     from collections.abs import Sequence, MutableMapping
 
-from .. import RegistryBase, RegistryError
-
 
 class ListRegistry(RegistryBase, Sequence):
-
-    """
-    Basic registry that just keeps a list of objects.
+    """Basic registry that just keeps a list of objects.
 
     Provides normal list-style access to the registry:
 

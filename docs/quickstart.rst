@@ -40,7 +40,7 @@ Flask application factory to create and easily extensible application.
 Following is a small example how a Flask application can be assemble from
 reusable packages that each provides configuration, extensions and blueprints:
 
-.. literalinclude:: ../tests/example_app.py
+.. literalinclude:: ../tests/registry_module/example_app.py
 
 Save this in a file named ``app.py`` next to the ``tests`` folder in the
 Flask-Registry distribution and run it using your Python interpreter.
@@ -52,7 +52,7 @@ Flask-Registry distribution and run it using your Python interpreter.
     Hello from Flask-Registry
 
 The blueprint is loaded from ``tests.views`` and only works if the extension
-``tests.mockext`` and the configuration in ``tests.config`` has been loaded.
+``registry_module.mockext`` and the configuration in ``registry_module.config`` has been loaded.
 
 See :ref:`application-discovery` for full explanation on what is
 happening in the example.

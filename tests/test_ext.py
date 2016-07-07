@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Flask-Registry
-# Copyright (C) 2013, 2014, 2015 CERN.
+# Copyright (C) 2013, 2014, 2016 CERN.
 #
 # Flask-Registry is free software; you can redistribute it and/or
 # modify it under the terms of the Revised BSD License; see LICENSE
@@ -10,11 +10,11 @@
 from __future__ import absolute_import
 
 import sys
+
 import six
 
-from .helpers import FlaskTestCase
-from flask.ext.registry import Registry, RegistryError, RegistryBase, \
-    RegistryProxy
+from flask_registry import Registry, RegistryBase, RegistryError, RegistryProxy
+from helpers import FlaskTestCase
 
 
 class TestRegistry(FlaskTestCase):
@@ -144,7 +144,7 @@ class TestRegistryProxy(FlaskTestCase):
 
 class TestExampleApp(FlaskTestCase):
     def setUp(self):
-        from tests.example_app import create_app, Config
+        from registry_module.example_app import create_app, Config
         self.config = Config()
         self.app = create_app(self.config)
         self.app.config['DEBUG'] = True

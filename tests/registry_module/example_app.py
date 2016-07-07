@@ -1,11 +1,13 @@
 from flask import Flask
-from flask_registry import Registry, PackageRegistry, ExtensionRegistry, \
-    ConfigurationRegistry, BlueprintAutoDiscoveryRegistry
+
+from flask_registry import (BlueprintAutoDiscoveryRegistry,
+                            ConfigurationRegistry, ExtensionRegistry,
+                            PackageRegistry, Registry)
 
 
 class Config(object):
-    PACKAGES = ['tests']
-    EXTENSIONS = ['tests.mockext']
+    PACKAGES = ['registry_module']
+    EXTENSIONS = ['registry_module.mockext']
     USER_CFG = True
 
 

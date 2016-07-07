@@ -1,17 +1,18 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Flask-Registry
-# Copyright (C) 2013, 2014, 2015 CERN.
+# Copyright (C) 2013, 2014, 2016 CERN.
 #
 # Flask-Registry is free software; you can redistribute it and/or
 # modify it under the terms of the Revised BSD License; see LICENSE
 # file for more details.
 
-import sys
 import os
 import re
+import sys
 
 sys.path.append(os.path.abspath('_themes'))
+sys.path.append(os.path.abspath(os.path.join('..', 'tests')))
 
 
 # If extensions (or modules to document with autodoc) are in another directory,

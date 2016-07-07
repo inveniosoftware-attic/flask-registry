@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Flask-Registry
-# Copyright (C) 2013, 2014, 2015 CERN.
+# Copyright (C) 2013, 2014, 2016 CERN.
 #
 # Flask-Registry is free software; you can redistribute it and/or
 # modify it under the terms of the Revised BSD License; see LICENSE
@@ -10,14 +10,13 @@
 from __future__ import absolute_import
 
 import pytest
-
 from mock import patch
 from pkg_resources import EntryPoint
-from flask.ext.registry import (Registry, RegistryBase, RegistryProxy,
-                                PkgResourcesDirDiscoveryRegistry,
-                                ImportPathRegistry, EntryPointRegistry)
 
-from .helpers import FlaskTestCase
+from flask_registry import (EntryPointRegistry, ImportPathRegistry,
+                            PkgResourcesDirDiscoveryRegistry, Registry,
+                            RegistryBase, RegistryProxy)
+from helpers import FlaskTestCase
 
 
 class MockEntryPoint(EntryPoint):
@@ -49,7 +48,7 @@ class TestPkgResourcesDiscoveryRegistry(FlaskTestCase):
         Registry(app=self.app)
 
         self.app.extensions['registry'].update(
-            pathns=ImportPathRegistry(initial=['tests']))
+            pathns=ImportPathRegistry(initial=['registry_module']))
         self.app.extensions['registry'].update(
             myns=PkgResourcesDirDiscoveryRegistry('resources',
                                                   app=self.app,
@@ -61,7 +60,7 @@ class TestPkgResourcesDiscoveryRegistry(FlaskTestCase):
         Registry(app=self.app)
 
         self.app.extensions['registry'].update(
-            pathns=ImportPathRegistry(initial=['tests']))
+            pathns=ImportPathRegistry(initial=['registry_module']))
         self.app.extensions['registry'].update(
             myns=PkgResourcesDirDiscoveryRegistry('non_existing_folder',
                                                   app=self.app,
@@ -119,7 +118,7 @@ class TestEntryPointRegistry(FlaskTestCase):
 
 class TestMockedEntryPoints(FlaskTestCase):
 
-    @patch('flask.ext.registry.registries.pkgresources.iter_entry_points',
+    @patch('flask_registry.registries.pkgresources.iter_entry_points',
            _mock_entry_points)
     def test_unique_without_double(self):
         Registry(app=self.app)
@@ -129,7 +128,7 @@ class TestMockedEntryPoints(FlaskTestCase):
 
         self.assertEqual(len(self.app.extensions['registry']['myns']), 2)
 
-    @patch('flask.ext.registry.registries.pkgresources.iter_entry_points',
+    @patch('flask_registry.registries.pkgresources.iter_entry_points',
            _mock_entry_points)
     def test_unique_load_without_double_and_importfail(self):
         Registry(app=self.app)
@@ -140,7 +139,7 @@ class TestMockedEntryPoints(FlaskTestCase):
                                unique=True)
         self.assertEqual(len(self.app.extensions['registry']['myns']), 1)
 
-    @patch('flask.ext.registry.registries.pkgresources.iter_entry_points',
+    @patch('flask_registry.registries.pkgresources.iter_entry_points',
            _mock_entry_points)
     def test_fail_load_not_unique(self):
         Registry(app=self.app)

@@ -1,28 +1,28 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Flask-Registry
-# Copyright (C) 2013, 2014, 2015 CERN.
+# Copyright (C) 2013, 2014, 2015, 2016 CERN.
 #
 # Flask-Registry is free software; you can redistribute it and/or
 # modify it under the terms of the Revised BSD License; see LICENSE
 # file for more details.
 
-"""
-Application discovery registries.
+"""Application discovery registries.
 
 They provide discovery functionality useful for dynamically constructing Flask
 applications based on configuration variables. This allows a developer to
 package config, blueprints and extensions into isolated and reusable packages
 which a framework can dynamically install into a Flask application.
 
-Such a package (named ``tests``) could look like:
+Such a package (named ``registry_module``) could look like and it is located
+in ``tests`` directory:
 
- * ``tests.views`` -- contains blueprints which should be registered on the
-   application object.
- * ``tests.mockext`` -- contains a ``setup_app()`` method which be used to
-   install any Flask extensions on the application object.
- * ``tests.config`` -- contains configuration variables specific for this
-   module.
+ * ``registry_module.views`` -- contains blueprints which should be registered
+   on the application object.
+ * ``registry_module.mockext`` -- contains a ``setup_app()`` method which be
+   used to install any Flask extensions on the application object.
+ * ``registry_module.config`` -- contains configuration variables specific for
+   this module.
 
 Following is a simplified example of a Flask application factory, that will
 load config, extensions and blueprints:
@@ -35,8 +35,8 @@ load config, extensions and blueprints:
     >>> from flask_registry import ConfigurationRegistry
     >>> from flask_registry import BlueprintAutoDiscoveryRegistry
     >>> class Config(object):
-    ...     PACKAGES = ['tests']
-    ...     EXTENSIONS = ['tests.mockext']
+    ...     PACKAGES = ['registry_module']
+    ...     EXTENSIONS = ['registry_module.mockext']
     ...     USER_CFG = True
     >>> def create_app(config):
     ...     app = Flask('myapp')
@@ -60,7 +60,7 @@ will search for ``config.py`` and ``views.py`` modules inside.
 
     >>> for pkg in app.extensions['registry']['packages']:
     ...     print(pkg)
-    tests
+    registry_module
 
 Extensions
 ^^^^^^^^^^
@@ -72,7 +72,7 @@ to dynamically initialize Flask extensions.
 
     >>> for pkg in app.extensions['registry']['extensions']:
     ...     print(pkg)
-    tests.mockext
+    registry_module.mockext
 
 Configuration
 ^^^^^^^^^^^^^
@@ -84,8 +84,8 @@ config:
 
     >>> config.USER_CFG
     True
-    >>> import tests.config
-    >>> tests.config.USER_CFG
+    >>> import registry_module.config
+    >>> registry_module.config.USER_CFG
     False
     >>> app.config['USER_CFG']
     True
@@ -100,7 +100,7 @@ Each ``views`` module should define either a single blueprint in the variable
 
 .. doctest::
 
-    >>> from tests import views
+    >>> from registry_module import views
     >>> isinstance(views.blueprint, Blueprint)
     True
     >>> len(views.blueprints)
@@ -115,12 +115,12 @@ Each ``views`` module should define either a single blueprint in the variable
 
 from __future__ import absolute_import
 
-from werkzeug.utils import import_string
 from flask import Blueprint, Config
+from werkzeug.utils import import_string
 
-from .core import ListRegistry, ImportPathRegistry
-from .modulediscovery import ModuleDiscoveryRegistry, \
-    ModuleAutoDiscoveryRegistry
+from .core import ImportPathRegistry, ListRegistry
+from .modulediscovery import (ModuleAutoDiscoveryRegistry,
+                              ModuleDiscoveryRegistry)
 
 
 # pylint: disable=R0921

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Flask-Registry
-# Copyright (C) 2013, 2014, 2015 CERN.
+# Copyright (C) 2013, 2014, 2016 CERN.
 #
 # Flask-Registry is free software; you can redistribute it and/or
 # modify it under the terms of the Revised BSD License; see LICENSE
@@ -70,7 +70,7 @@ manner:
 >>> r = Registry(app=app)
 >>> from flask_registry import ImportPathRegistry
 >>> from flask_registry import PkgResourcesDirDiscoveryRegistry
->>> r['packages'] = ImportPathRegistry(initial=['tests'])
+>>> r['packages'] = ImportPathRegistry(initial=['registry_module'])
 >>> r['res'] = PkgResourcesDirDiscoveryRegistry('resources', app=app)
 >>> os.path.basename(r['res'][0]) == 'testresource.cfg'
 True
@@ -79,8 +79,9 @@ True
 from __future__ import absolute_import
 
 import os
+
+from pkg_resources import iter_entry_points, resource_isdir, resource_listdir
 from werkzeug.utils import import_string
-from pkg_resources import iter_entry_points, resource_listdir, resource_isdir
 
 from .core import DictRegistry
 from .modulediscovery import ModuleAutoDiscoveryRegistry

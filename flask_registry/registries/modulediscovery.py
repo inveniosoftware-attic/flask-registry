@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Flask-Registry
-# Copyright (C) 2013, 2014, 2015 CERN.
+# Copyright (C) 2013, 2014, 2016 CERN.
 #
 # Flask-Registry is free software; you can redistribute it and/or
 # modify it under the terms of the Revised BSD License; see LICENSE
@@ -31,7 +31,7 @@ We then create the list of packages to search through using an
 
 .. doctest::
 
-    >>> r['mypackages'] = ImportPathRegistry(initial=['tests'])
+    >>> r['mypackages'] = ImportPathRegistry(initial=['registry_module'])
 
 Then, initialize the ``ModuleDiscoveryRegistry`` and run the discovery:
 
@@ -56,7 +56,7 @@ lazy loading looks like this:
     >>> app = Flask('myapp')
     >>> r = Registry(app=app)
     >>> pkg_proxy = RegistryProxy('mypackages', ImportPathRegistry,
-    ...     initial=['tests'])
+    ...     initial=['registry_module'])
     >>> mod_proxy = RegistryProxy('mydiscoveredmodules',
     ...     ModuleDiscoveryRegistry,
     ...     'helpers',
@@ -77,12 +77,13 @@ lazy loading looks like this:
 from __future__ import absolute_import
 
 import sys
-import six
-from werkzeug.utils import find_modules, import_string
-from werkzeug._compat import reraise
-from flask import current_app, has_app_context
 
-from .. import RegistryProxy, RegistryBase, RegistryError
+import six
+from flask import current_app, has_app_context
+from werkzeug._compat import reraise
+from werkzeug.utils import find_modules, import_string
+
+from .. import RegistryBase, RegistryError, RegistryProxy
 from .core import ModuleRegistry
 
 

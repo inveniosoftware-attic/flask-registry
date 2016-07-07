@@ -1,16 +1,19 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Flask-Registry
-# Copyright (C) 2013, 2014, 2015 CERN.
+# Copyright (C) 2013, 2014, 2016 CERN.
 #
 # Flask-Registry is free software; you can redistribute it and/or
 # modify it under the terms of the Revised BSD License; see LICENSE
 # file for more details.
 
+include *.rst
+include .coveragerc .gitmodules run-tests.sh
 include LICENSE AUTHORS CHANGES README.rst
-include .coveragerc run-tests.sh
 include docs/*.rst docs/*.py docs/Makefile
+include pytest.ini
 include tests/*.py
 include tests/resources/testresource.cfg
-recursive-include docs/_themes *.py *.css *.css_t *.conf *.html README
+include tox.ini
 recursive-include docs/_templates *.html
+recursive-include docs/_themes *.py *.css *.css_t *.conf *.html README
